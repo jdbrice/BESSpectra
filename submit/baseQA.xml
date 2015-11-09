@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<job maxFilesPerProcess="1" filesPerHour="60" fileListSyntax="xrootd">
+	
+	<command>
+		starver SL14i
+		root4star -b -q -l 'scripts/baseQA.C("'$FILELIST'", "'$JOBID.root'", 1000000, 5)' &gt;&amp; log_${JOBID}.log
+
+	</command>
+
+	<stdout URL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/log/$JOBID.out" />
+	<stderr URL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/log/$JOBID.err" />
+	
+	<input URL="filelist:/star/u/jdb/work/BESSpectra/list/small.lis" nFiles="20000" />
+
+	<output fromScratch="*" toURL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/"/>
+
+	<SandBox>
+ 		<Package>
+ 			<File>file:./scripts/baseQA.C</File>
+ 			<File>file:./.sl64_gcc482/</File> 
+ 			<File>file:./StRoot/StRefMultCorr/Centrality_def_refmult.txt</File>
+ 			<File>file:./cuts.xml</File>
+ 		</Package> 
+ 	</SandBox>
+
+	<Generator> 
+ 		<Location>/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/gen</Location> 
+ 	</Generator> 
+</job>
