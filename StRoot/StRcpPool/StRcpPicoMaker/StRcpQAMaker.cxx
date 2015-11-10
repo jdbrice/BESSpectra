@@ -98,7 +98,9 @@ void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	histos->ptRatio2D->Fill( pMom.perp(), gMom.perp() );
 	histos->dca->Fill( primaryTrack->dcaGlobal().magnitude() );
 	histos->yLocal->Fill( tofPid.yLocal() );
-	histos->zLocal->Fill( tofPid.zLocal() );	
+	histos->zLocal->Fill( tofPid.zLocal() );
+
+	histos->ptSpectra[ cent9 ]->Fill( pMom.perp() );	
 }
 
 //---------------------------------------------------------------------------

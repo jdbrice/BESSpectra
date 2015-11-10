@@ -1,4 +1,4 @@
-
+*.root
 StRooBarb
 *.sl64*
 temp_gccflags.c
@@ -6,3 +6,7 @@ StRoot/StRooBarb
 ._*
 CVS
 .consign
+*.dataset
+*.session.xml
+*.tmp
+list
