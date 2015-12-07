@@ -36,9 +36,9 @@ void StRcpPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 	mData.gPt[ iGoodTrack ] 		= gMom.perp();
 	mData.pEta[ iGoodTrack ] 		= pMom.pseudoRapidity();
 
-	mData.nHitsFit[ iGoodTrack ] 	= tGlobal->nHitsFit(); // use kTpcId ??
-	mData.nHitsDedx[ iGoodTrack ] 	= tGlobal->nHitsDedx();
-	mData.nHitsPossible[ iGoodTrack ] = tGlobal->nHitsPoss(); // use kTpcId ??
+	mData.nHitsFit[ iGoodTrack ] 	= tPrimary->nHitsFit(kTpcId); 
+	mData.nHitsDedx[ iGoodTrack ] 	= tPrimary->nHitsDedx();
+	mData.nHitsPossible[ iGoodTrack ] = tGlobal->nHitsPoss(kTpcId);
 
 	mData.dca[ iGoodTrack ]			= (Float_t)tPrimary->dcaGlobal().magnitude();
 

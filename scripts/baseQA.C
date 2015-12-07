@@ -53,6 +53,7 @@ void baseQA( const Char_t *fileList = "small.lis",
 		istat = chain->Make(iEvent);
 		if (istat == 2) {
 			cout << "Last  event processed. Status = " << istat << endl;
+			break;
 		}
 		if (istat == 3) {
 			cout << "Error event processed. Status = " << istat << endl;

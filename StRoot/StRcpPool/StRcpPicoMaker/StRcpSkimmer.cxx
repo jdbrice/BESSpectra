@@ -170,7 +170,7 @@ Bool_t StRcpSkimmer::keepEvent(){
 		return false;
 	passEventCut( "Trigger" );
 
-	if ( badRunMap.count( runId ) > 0 && badRunMap[ runId ] == true ){
+	if ( refmultCorrUtil->isBadRun( runId ) ){
 		LOG_DEBUG << runId << " is BAD " << endm;
 		return false;
 	}

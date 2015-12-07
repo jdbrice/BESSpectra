@@ -523,9 +523,10 @@ void StRefMultCorr::readBadRuns()
 {
   // Read bad run numbers
   //   - From year 2010 and 2011
-  for(Int_t i=0; i<2; i++) {
+  vector<int> years = { 2010, 2011, 2014 };
+  for(int year : years) {
     cout << "StRefMultCorr::readBadRuns  For " << mName << ": open " << flush ;
-    const Int_t year = 2010 + i ;
+    // const Int_t year = 2010 + i ;
     const Char_t* inputFileName(Form("StRoot/StRefMultCorr/bad_runs_refmult_year%d.txt", year));
     ifstream fin(inputFileName);
     if(!fin){
