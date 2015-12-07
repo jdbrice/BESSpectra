@@ -32,7 +32,6 @@ class StRcpMiniMcSkimmer {
 	StRcpMiniMcSkimmer(int _gid, string _inFile, string _suffix, string _trackType = "mc", int _maxFiles = -1); // trackType = 'mc' or 'rc'
 	~StRcpMiniMcSkimmer();
 
-	map< int, bool > badRunMap; // uses list of bad runs in StRcpSkimmer::badRuns
 
 	void make(  ); 
 
@@ -46,6 +45,10 @@ protected:
 
 	int gid;
 	double mass;
+
+
+	vector<int> badRuns;
+	map< int, bool > badRunMap;
 
 
 
@@ -63,8 +66,11 @@ protected:
 	// event
 	jdb::ConfigRange *cut_vZ, *cut_vR, *cut_nTofMatch;
 	//track
-	jdb::ConfigRange *cut_nHitsFit, *cut_nHitsDedx, *cut_nHitsRatio;
+	jdb::ConfigRange *cut_nHitsFit, *cut_nHitsDedx, *cut_nHitsRatio,  *cut_rapidity, *cut_pseudorapidity;
 	jdb::ConfigRange *cut_pt, *cut_ptRatio, *cut_dca, *cut_yLocal, *cut_zLocal;
+
+	double massAssumption; // for rapidity
+	jdb::ConfigRange *runRange; // for bad run QA
 
 
 	/**

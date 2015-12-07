@@ -160,40 +160,21 @@ Bool_t StRcpSkimmer::keepEvent(){
 	//-- read in TOF info
 	StBTofHeader* tofHeader = muDst->btofHeader();
 
-	//BBC_MB
-	// 15GeV
-	Bool_t isTrigger = 
-			( 	muEvent->triggerIdCollection().nominal().isTrigger(440005) ||	// BBC_MB but not used
-				muEvent->triggerIdCollection().nominal().isTrigger(440015) ||	// BBC_MB
-				muEvent->triggerIdCollection().nominal().isTrigger(440001) || 	// VPD_MB
-				muEvent->triggerIdCollection().nominal().isTrigger(440004) ); 	// ZDC_MB
 	
-	// MB
-	// 11 GeV
-	// Bool_t isTrigger = 
-	// 		( 	muEvent->triggerIdCollection().nominal().isTrigger(310014) );
-	
-	// MB
-	// 19 GeV
-	// Bool_t isTrigger = 
-	// 		( 	muEvent->triggerIdCollection().nominal().isTrigger(340011) || 
-	//  			muEvent->triggerIdCollection().nominal().isTrigger(340021) || 
-	//  			muEvent->triggerIdCollection().nominal().isTrigger(340001) ||
-	//  			muEvent->triggerIdCollection().nominal().isTrigger(340002) ||
-	//  			muEvent->triggerIdCollection().nominal().isTrigger(340061) ||
-	//  			muEvent->triggerIdCollection().nominal().isTrigger(340060) );
-	
-	
+	Bool_t isTrigger = false;
+	for ( int t : triggers ){
+		isTrigger = isTrigger || muEvent->triggerIdCollection().nominal().isTrigger( t );
+	}
 
 	if ( !isTrigger )
 		return false;
 	passEventCut( "Trigger" );
 
-	// if ( badRunMap.find( runId ) != badRunMap.end() && badRunMap[ runId ] == true ){
-	// 	//cout << runId << " is BAD " << endl << endm;
-	// 	return false;
-	// }
-	// passEventCut( "BadRun" );
+	if ( badRunMap.count( runId ) > 0 && badRunMap[ runId ] == true ){
+		LOG_DEBUG << runId << " is BAD " << endm;
+		return false;
+	}
+	passEventCut( "BadRun" );
 
 
 	StThreeVectorD pVtx(-999., -999., -999.);  
@@ -217,25 +198,14 @@ Bool_t StRcpSkimmer::keepEvent(){
 
 
 	runId = muEvent->runId();
-	
-	//cout << " testing bad run : 15070010 " << ( badRunMap.find( 15070010 ) != badRunMap.end() && badRunMap[ 15070010 ] == true ) << endl << endm;
-	
+
 
 	// The Pre event cuts hook
 	preEventCuts();
 
-	
 
-	// Initialize the vertex	
-	// float xOffset = - 0.09797;		// 11GeV
-	// float yOffset = 0.2274;			// 11GeV
-	// float xOffset = - 0.3685;		// 19GeV
-	// float yOffset = 0.03097;			// 19GeV
-	float xOffset = 0.0;			// 15GeV
-	float yOffset = 0.89;			// 15GeV
-
-	pX = pVtx.x() + xOffset;
-	pY = pVtx.y() + yOffset;
+	pX = pVtx.x() + cut_vR_offset->x;
+	pY = pVtx.y() + cut_vR_offset->y;
 	pZ = pVtx.z();
 
 
@@ -287,16 +257,16 @@ void StRcpSkimmer::postTrackCuts(StMuTrack *primaryTrack ){
 Bool_t StRcpSkimmer::keepTrack( Int_t iNode ){
 	//LOG_INFO << "StRcpSkimmer::keepTrack( " << iNode << " )" << endm;
 
-	StMuTrack*	tPrimary 	= (StMuTrack*)muDst->primaryTracks(iNode);
+	StMuTrack*	primaryTrack 	= (StMuTrack*)muDst->primaryTracks(iNode);
 	passTrackCut("All");
 
-	const StMuTrack *globalTrack = tPrimary->globalTrack();
+	const StMuTrack *globalTrack = primaryTrack->globalTrack();
 	if (!globalTrack ) 
 		return false;
 
 	passTrackCut( "primaryWGlobal");
 
-	StThreeVectorF pMom = tPrimary->momentum();
+	StThreeVectorF pMom = primaryTrack->momentum();
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
@@ -305,17 +275,17 @@ Bool_t StRcpSkimmer::keepTrack( Int_t iNode ){
 	/**
 	 * Pre Cut Hook
 	 */
-	preTrackCuts( tPrimary );
+	preTrackCuts( primaryTrack );
 
-	if ( globalTrack->nHitsFit(kTpcId) < cut_nHitsFit->min  )
+	if ( primaryTrack->nHitsFit( kTpcId ) < cut_nHitsFit->min  )
 		return false;
 	passTrackCut( "nHitsFit" );
 
-	if ( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss() < cut_nHitsRatio->min )
+	if ( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
 		return false;
 	passTrackCut( "nHitsRatio" );
 
-	if ( globalTrack->nHitsDedx() < cut_nHitsDedx->min )
+	if ( primaryTrack->nHitsDedx() < cut_nHitsDedx->min )
 		return false;	
 	passTrackCut( "nHitsDedx" );
 
@@ -327,15 +297,25 @@ Bool_t StRcpSkimmer::keepTrack( Int_t iNode ){
 		return false;
 	passTrackCut( "pmmtm" );
 
-	if ( tPrimary->dcaGlobal().magnitude() > cut_dca->max )
+	if ( primaryTrack->dcaGlobal().magnitude() > cut_dca->max )
 		return false;
 	passTrackCut( "DCA" );
+
+	double y = rapidity( pMom.perp(), pMom.pseudoRapidity(), massAssumption );
+	if ( y < cut_rapidity->min || y > cut_rapidity->max )
+		return false;
+	passTrackCut( "y" );
+
+	double eta = pMom.pseudoRapidity();
+	if ( eta < cut_pseudorapidity->min || eta > cut_pseudorapidity->max )
+		return false;
+	passTrackCut( "eta" );
 
 
 	/**
 	 * Post Cut Hook
 	 */
-	postTrackCuts( tPrimary );
+	postTrackCuts( primaryTrack );
 
 	return true;
 
@@ -366,6 +346,8 @@ StRcpSkimmer::StRcpSkimmer( const Char_t *name="rcpSkimmer", const Char_t *outna
 	// make the cuts variables
 	cut_vZ = new jdb::ConfigRange( cfgCuts, "Event.zVertex" );
 	cut_vR = new jdb::ConfigRange( cfgCuts, "Event.rVertex" );
+	cut_vR_offset = new jdb::ConfigPoint( cfgCuts, "Event.rVertexOffset" );
+
 	cut_nTofMatch = new jdb::ConfigRange( cfgCuts, "Event.nTofMatch" );
 
 	cut_nHitsFit = new jdb::ConfigRange( cfgCuts, "Track.nHitsFit" );
@@ -377,29 +359,57 @@ StRcpSkimmer::StRcpSkimmer( const Char_t *name="rcpSkimmer", const Char_t *outna
 	cut_dca = new jdb::ConfigRange( cfgCuts, "Track.dca" );
 	cut_yLocal = new jdb::ConfigRange( cfgCuts, "Track.yLocal" );
 	cut_zLocal = new jdb::ConfigRange( cfgCuts, "Track.zLocal" );
+	cut_rapidity = new jdb::ConfigRange( cfgCuts, "Track.rapidity", -10000, 10000 );
+	cut_pseudorapidity = new jdb::ConfigRange( cfgCuts, "Track.pseudorapidity", -10000, 10000 );
+	massAssumption = cfgCuts->getDouble( "Track.rapidity:mass", 0.13957018 /*pi +/- mass in GeV/c */);
+
+	triggers = cfgCuts->getIntVector( "Event.triggers" );
+	badRuns = cfgCuts->getIntVector( "BadRuns" );
+	runRange = new jdb::ConfigRange( cfgCuts, "RunRange" );
+	// build the bad run map
+	for ( int rId : badRuns ){
+		badRunMap[ rId ] = true;
+	}
+
+
+	string cfgReport = cfgCuts->report();
+
+	LOG_DEBUG << "Config Report : \n " << cfgReport << endm;
+
+	LOG_INFO << "Processing Runs between " << runRange->min << " --> " << runRange->max << " (inclusive) " << endm; 
+	LOG_INFO << "Excluding " << badRuns.size() << " bad runs " << endm;
+	stringstream brs;
+	for ( int i : badRuns ){
+		brs << i << ", ";
+	}
+	LOG_INFO << brs.str() << endm << endm;
 
 	// report
-	cout << endl << name << endl << endm;
-	cout << "Event Cuts \n\n" << endm;
-	cout << "Z Vertex : ( " << cut_vZ->min  << ", " << cut_vZ->max << " )\n" << endm;
-	cout << "R Vertex : ( " << cut_vR->min  << ", " << cut_vR->max << " )\n" << endm;
-	cout << "nTofMatch : ( " << cut_nTofMatch->min  << ", " << cut_nTofMatch->max << " )\n" << endm;
-
-	cout << "Track Cuts \n\n" << endm;
-	cout << "nHitsFit : ( " << cut_nHitsFit->min  << ", " << cut_nHitsFit->max << " )\n" << endm;
-	cout << "nHitsDedx : ( " << cut_nHitsDedx->min  << ", " << cut_nHitsDedx->max << " )\n" << endm;
-	cout << "nHitsRatio : ( " << cut_nHitsRatio->min  << ", " << cut_nHitsRatio->max << " )\n" << endm;
-	cout << "pt : (" << cut_pt->min << "," << cut_pt->max << " ) \n" << endm;
-	cout << "ptRatio : (" << cut_ptRatio->min << "," << cut_ptRatio->max << " ) \n" << endm;
-	cout << "dca : (" << cut_dca->min << "," << cut_dca->max << " ) \n" << endm;
-	cout << "yLocal : (" << cut_yLocal->min << "," << cut_yLocal->max << " ) \n" << endm;
-	cout << "zLocal : (" << cut_zLocal->min << "," << cut_zLocal->max << " ) \n" << endm;
-
-
-	// create the bad run map - sanity check - first attempt at bad run filtering wasn't working as expected
-	for ( int i = 0; i < nBadRuns; i++ ){
-		badRunMap[ badRuns[ i ] ] = true;
+	LOG_INFO << endl << name << endl << endm;
+	for ( int i = 0; i < triggers.size(); i++ ){
+		LOG_INFO << "Trigger : " << triggers[ i ] << endm;
 	}
+	LOG_INFO << endl << name << endl << endm;
+	LOG_INFO << "Event Cuts \n\n" << endm;
+	LOG_INFO << "Z Vertex : ( " << cut_vZ->min  << ", " << cut_vZ->max << " )" << endm;
+	LOG_INFO << "R Vertex : ( " << cut_vR->min  << ", " << cut_vR->max << " )" << endm;
+	LOG_INFO << "R Vertex Offset (added): ( " << cut_vR_offset->x  << ", " << cut_vR_offset->y << " )" << endm;
+	LOG_INFO << "nTofMatch : ( " << cut_nTofMatch->min  << ", " << cut_nTofMatch->max << " )" << endm;
+
+	LOG_INFO << "Track Cuts \n\n" << endm;
+	LOG_INFO << "nHitsFit : ( " << cut_nHitsFit->min  << ", " << cut_nHitsFit->max << " )" << endm;
+	LOG_INFO << "nHitsDedx : ( " << cut_nHitsDedx->min  << ", " << cut_nHitsDedx->max << " )" << endm;
+	LOG_INFO << "nHitsRatio : ( " << cut_nHitsRatio->min  << ", " << cut_nHitsRatio->max << " )" << endm;
+	LOG_INFO << "pt : (" << cut_pt->min << "," << cut_pt->max << " ) " << endm;
+	LOG_INFO << "ptRatio : (" << cut_ptRatio->min << "," << cut_ptRatio->max << " ) " << endm;
+	LOG_INFO << "dca : (" << cut_dca->min << "," << cut_dca->max << " ) " << endm;
+	LOG_INFO << "yLocal : (" << cut_yLocal->min << "," << cut_yLocal->max << " ) " << endm;
+	LOG_INFO << "zLocal : (" << cut_zLocal->min << "," << cut_zLocal->max << " ) " << endm;
+	LOG_INFO << "rapidity : (" << cut_rapidity->min << "," << cut_rapidity->max << " ) mass = " << massAssumption << "" << endm;
+	LOG_INFO << "pseudorapidity : (" << cut_pseudorapidity->min << "," << cut_pseudorapidity->max << " ) " << endm;
+	
+	
+	LOG_INFO << "\n\n\n" << endm;
 
 }
 
@@ -461,263 +471,3 @@ Int_t StRcpSkimmer::Make(){
 
   return kStOK;
 }
-
-
-
-
-int StRcpSkimmer::nBadRuns = 313;
-int StRcpSkimmer::badRuns[] = { 
-15046073, 
-15046089, 
-15046094, 
-15046096, 
-15046102, 
-15046103, 
-15046104, 
-15046105, 
-15046106, 
-15046107, 
-15046108, 
-15046109, 
-15046110, 
-15046111, 
-15047004, 
-15047015, 
-15047016, 
-15047019, 
-15047021, 
-15047023, 
-15047024, 
-15047026, 
-15047027, 
-15047028, 
-15047029, 
-15047030, 
-15047039, 
-15047040, 
-15047041, 
-15047044, 
-15047047, 
-15047050, 
-15047052, 
-15047053, 
-15047056, 
-15047057, 
-15047061, 
-15047062, 
-15047063, 
-15047064, 
-15047065, 
-15047068, 
-15047069, 
-15047070, 
-15047071, 
-15047072, 
-15047074, 
-15047075, 
-15047082, 
-15047085, 
-15047086, 
-15047087, 
-15047093, 
-15047096, 
-15047097, 
-15047098, 
-15047100, 
-15047102, 
-15047104, 
-15047106, 
-15048003, 
-15048004, 
-15048012, 
-15048013, 
-15048014, 
-15048016, 
-15048017, 
-15048018, 
-15048019, 
-15048020, 
-15048021, 
-15048023, 
-15048024, 
-15048025, 
-15048026, 
-15048028, 
-15048029, 
-15048030, 
-15048031, 
-15048033, 
-15048034, 
-15048074, 
-15048075, 
-15048076, 
-15048077, 
-15048078, 
-15048079, 
-15048080, 
-15048081, 
-15048082, 
-15048083, 
-15048084, 
-15048085, 
-15048086, 
-15048087, 
-15048088, 
-15048089, 
-15048091, 
-15048092, 
-15048093, 
-15048094, 
-15048095, 
-15048096, 
-15048097, 
-15048098, 
-15049002, 
-15049003, 
-15049009, 
-15049013, 
-15049014, 
-15049015, 
-15049016, 
-15049017, 
-15049018, 
-15049019, 
-15049020, 
-15049021, 
-15049022, 
-15049023, 
-15049025, 
-15049026, 
-15049027, 
-15049028, 
-15049030, 
-15049031, 
-15049032, 
-15049033, 
-15049037, 
-15049038, 
-15049039, 
-15049040, 
-15049041, 
-15049074, 
-15049077, 
-15049083, 
-15049084, 
-15049085, 
-15049086, 
-15049087, 
-15049088, 
-15049089, 
-15049090, 
-15049091, 
-15049092, 
-15049093, 
-15049094, 
-15049096, 
-15049097, 
-15049098, 
-15049099, 
-15050001, 
-15050002, 
-15050003, 
-15050004, 
-15050005, 
-15050006, 
-15050010, 
-15050011, 
-15050012, 
-15050013, 
-15050014, 
-15050015, 
-15050016, 
-15051131, 
-15051132, 
-15051133, 
-15051134, 
-15051137, 
-15051141, 
-15051144, 
-15051146, 
-15051147, 
-15051148, 
-15051149, 
-15051156, 
-15051157, 
-15051159, 
-15051160, 
-15052001, 
-15052004, 
-15052005, 
-15052006, 
-15052007, 
-15052008, 
-15052009, 
-15052010, 
-15052011, 
-15052014, 
-15052015, 
-15052016, 
-15052017, 
-15052018, 
-15052019, 
-15052020, 
-15052021, 
-15052022, 
-15052023, 
-15052024, 
-15052025, 
-15052026, 
-15052040, 
-15052041, 
-15052042, 
-15052043, 
-15052060, 
-15052061, 
-15052062, 
-15052063, 
-15052064, 
-15052065, 
-15052066, 
-15052067, 
-15052068, 
-15052069, 
-15052070, 
-15052073, 
-15052074, 
-15052075,  
-15053027, 
-15053028, 
-15053029, 
-15053034, 
-15053035, 
-15053052, 
-15053054, 
-15053055, 
-15054053, 
-15054054, 
-15055018, 
-15055137, 
-15056117, 
-15057055, 
-15057059, 
-15058006, 
-15058011, 
-15058021, 
-15059057, 
-15059058, 
-15061001, 
-15061009, 
-15062006, 
-15062069, 
-15065012, 
-15065014, 
-15066070, 
-15068013, 
-15068014, 
-15068016, 
-15068018, 
-15069036, 
-15070008, 
-15070009, 
-15070010
-};

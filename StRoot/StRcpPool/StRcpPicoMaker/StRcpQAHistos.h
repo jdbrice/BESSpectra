@@ -12,18 +12,28 @@
 
 #include "StRooBarb/Utils.h"
 
+#include <map>
+
 class StRcpQAHistos
 {
 public:
-	StRcpQAHistos(){
+	StRcpQAHistos( int firstRun, int lastRun = -1 ){
 
 
+		// parse out the first and last day of the run
+		int firstDay = (firstRun/1000) - (firstRun/100000)*100;
+		int lastDay = lastRun / 1000 - (lastRun/100000)*100;
+		if ( lastRun < 0 )
+			lastDay = firstDay + 24;
+
+		int nDays = lastDay - firstDay + 1;
+		string rTitle = "Run Ids Pre-Rejection; Day - " + jdb::ts( firstDay ) + "; Run# for Day";
 		/*
 			Event Cuts
 		 */
 		eventCuts 	= new TH1I( "event_cuts", "Event Cuts", 10, 0, 10 );
-		pre_runIds 	= new TH2I( "pre_run_ids", "Run Ids Pre-Rejection; Day - 46; Run# for Day", 25, 0, 25, 150, 0, 150 );
-		runIds 		= new TH2I( "run_ids", "Run Ids; Day - 46; Run# for Day", 25, 0, 25, 150, 0, 150 );
+		pre_runIds 	= new TH2I( "pre_run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
+		runIds 		= new TH2I( "run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
 		
 		nTrack_refMult = new TH1F( "event_nTrack_refMult", "nTrack vs. RefMult", 400, 0, 400 );
 		
@@ -31,6 +41,7 @@ public:
 		refMult 	= new TH1F( "event_refMult", "Raw RefMult", 400, 0, 400 );
 		corrRefMult = new TH1F( "event_corrRefMult", "Corr RefMult", 1000, 0, 500 );
 		refMultBins = new TH1F( "event_refMultBins", "Corr RefMult Bins", 10, 0, 10 );
+		refMultBinsUnweighted = new TH1F( "event_refMultBinsUnweighted", "Corr RefMult Bins (Unweighted)", 10, 0, 10 );
 
 		pre_vZ 	= new TH1F( "event_pre_vZ", "pre vZ", 400, -200, 200 );
 		vZ 		= new TH1F( "event_vZ", "vZ", 100, -50, 50 );
@@ -76,6 +87,15 @@ public:
 		pre_zLocal 	= new TH1F( "track_pre_zLocal", "", 120, -3.5, 3.5  );
 		zLocal 		= new TH1F( "track_zLocal", "", 120, -3.5, 3.5 );
 
+		pre_eta 	= new TH1F( "track_pre_eta", "pre #eta", 300, -1.5, 1.5 );
+		eta 		= new TH1F( "track_eta", "#eta", 300, -1.5, 1.5 );
+
+		pre_rapidity 	= new TH1F( "track_pre_rapidity", "pre rapidity", 300, -1.5, 1.5 );
+		rapidity 		= new TH1F( "track_rapidity", "rapidity", 300, -1.5, 1.5 );
+
+		pre_eta_phi 	= new TH2F( "track_pre_eta_phi", "pre #eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
+		eta_phi 		= new TH2F( "track_eta_phi", "#eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
+
 		trackBeta 	= new TH2F( "trackBeta", "beta", 80, 0, 5, 200, -.5, 3 );
 
 		for ( int i = 0; i < 9; i++ ){
@@ -93,7 +113,7 @@ public:
 	TH1I *eventCuts;
 	TH1F *pre_vZ, *pre_vR, *pre_nTofMatchA, *nTrack_refMult, *refMult, *pre_refMult;
 	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult;
-	TH1F *vZ, *vR, *nTofMatchA, *corrRefMult, *refMultBins;
+	TH1F *vZ, *vR, *nTofMatchA, *corrRefMult, *refMultBins, *refMultBinsUnweighted;
 
 
 	/**
@@ -102,6 +122,7 @@ public:
 	TH1I *trackCuts;
 	TH1F * pre_nHitsFit, *pre_nHitsDedx, *pre_nHitsFitOverPoss, *pre_ptRatio, *pre_dca;
 	TH1F * nHitsFit, *nHitsDedx, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
+	TH1F *pre_eta, *eta, *pre_rapidity, *rapidity;
 	TH2F * pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
 	TH2F * trackBeta;
 

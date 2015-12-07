@@ -13,6 +13,7 @@
 // roobarb
 #include "StRooBarb/XmlConfig.h"
 #include "StRooBarb/ConfigRange.h"
+#include "StRooBarb/ConfigPoint.h"
 
 class StMuDstMaker;
 class StMuDst;
@@ -30,9 +31,9 @@ class StRcpSkimmer : public StMaker {
 	Int_t  FinishRun(int runnumber);
 	Int_t  Finish();
 
-	static int badRuns[];
-	static int nBadRuns;
-	map< int, bool > badRunMap;
+	vector<int> badRuns;
+	map< int, bool> badRunMap;
+
 
 
 protected:
@@ -42,8 +43,18 @@ protected:
 	// event
 	jdb::ConfigRange *cut_vZ, *cut_vR, *cut_nTofMatch;
 	//track
-	jdb::ConfigRange *cut_nHitsFit, *cut_nHitsDedx, *cut_nHitsRatio;
+	jdb::ConfigRange *cut_nHitsFit, *cut_nHitsDedx, *cut_nHitsRatio, *cut_rapidity, *cut_pseudorapidity;
 	jdb::ConfigRange *cut_pt, *cut_ptRatio, *cut_dca, *cut_yLocal, *cut_zLocal;
+	jdb::ConfigPoint *cut_vR_offset;
+
+
+	// for bad run QA
+	jdb::ConfigRange *runRange;
+
+	vector<int> triggers;
+
+	double massAssumption;
+
 
 
 	Int_t nTofMatchedTracksA();
@@ -64,6 +75,17 @@ protected:
 	Int_t cent16;
 	Int_t nTofMatchedTracks;
 	Float_t pX, pY, pZ;
+
+	double rapidity( double pt, double eta, double m ) {
+
+		double ce = cosh( eta );
+		double se = sinh( eta );
+
+		double n = sqrt( m*m + pt*pt*ce*ce) + pt * se ;
+		double d = sqrt( m*m + pt*pt );
+
+		return log( n / d );
+	}
 
 
 	virtual void postTrackLoop( Int_t nPrimaryGood );

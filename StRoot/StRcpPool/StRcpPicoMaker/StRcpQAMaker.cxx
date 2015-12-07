@@ -9,8 +9,6 @@
 
 ClassImp(StRcpQAMaker);
 
-int StRcpQAMaker::firstDay = 15046000; // first day of the Run14_AuAu15
-
 void StRcpQAMaker::postTrackLoop( Int_t nPrimaryGood ){
 	histos->nTrack_refMult->Fill( corrRefMult, nPrimaryGood  );
 }
@@ -22,8 +20,8 @@ void StRcpQAMaker::passEventCut( string name ){
 		StMuEvent *muEvent = muDst->event();
 		int runId = muEvent->runId();	
 
-		int day = (runId - StRcpQAMaker::firstDay) / 1000; // day of run from first ( indexed at 0)
-		int drn = (runId - (StRcpQAMaker::firstDay + day * 1000) ); // run in day
+		int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
+		int drn = (runId - (runRange->min + day * 1000) ); // run in day
 
 		if ( "Trigger" == name ){
 			histos->pre_runIds->Fill( day, drn );
@@ -59,6 +57,7 @@ void StRcpQAMaker::postEventCuts(){
 	histos->refMult->Fill( muEvent->refMult() );
 	histos->corrRefMult->Fill( corrRefMult, eventWeight );
 	histos->refMultBins->Fill( cent9, eventWeight );
+	histos->refMultBinsUnweighted->Fill( cent9 );
 	histos->nTofMatchA_corrRefMult->Fill( nTofMatchedTracks, corrRefMult );
 }
 
@@ -70,16 +69,21 @@ void StRcpQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
-	histos->pre_nHitsFit->Fill( globalTrack->nHitsFit(kTpcId) );
-	histos->pre_nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss() );
-	histos->pre_nHitsDedx->Fill( globalTrack->nHitsDedx() );
-	histos->pre_ptRatio->Fill( ptRatio );
-	histos->pre_ptRatio2D->Fill( pMom.perp(), gMom.perp() );
-	histos->pre_dca->Fill( primaryTrack->dcaGlobal().magnitude() );
-	histos->pre_yLocal->Fill( tofPid.yLocal() );
-	histos->pre_zLocal->Fill( tofPid.zLocal() );
+	histos->pre_nHitsFit->Fill( globalTrack->nHitsFit(kTpcId), eventWeight );
+	histos->pre_nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss(kTpcId), eventWeight );
+	histos->pre_nHitsDedx->Fill( globalTrack->nHitsDedx(), eventWeight );
+	histos->pre_ptRatio->Fill( ptRatio, eventWeight );
+	histos->pre_ptRatio2D->Fill( pMom.perp(), gMom.perp(), eventWeight );
+	histos->pre_dca->Fill( primaryTrack->dcaGlobal().magnitude(), eventWeight );
+	histos->pre_yLocal->Fill( tofPid.yLocal(), eventWeight );
+	histos->pre_zLocal->Fill( tofPid.zLocal(), eventWeight );
+	histos->pre_eta->Fill( pMom.pseudoRapidity(), eventWeight );
+	double y = rapidity( pMom.perp(), pMom.pseudoRapidity(), massAssumption );
+	histos->pre_rapidity->Fill( y, eventWeight );
+	histos->pre_eta_phi->Fill( pMom.pseudoRapidity(), pMom.phi(), eventWeight );
 
-	histos->trackBeta->Fill( pMom.mag(), 1.0 / tofPid.beta() );
+
+	histos->trackBeta->Fill( pMom.mag(), 1.0 / tofPid.beta(), eventWeight );
 }
 
 void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
@@ -91,16 +95,22 @@ void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
-	histos->nHitsFit->Fill( globalTrack->nHitsFit(kTpcId) );
-	histos->nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss() );
-	histos->nHitsDedx->Fill( globalTrack->nHitsDedx() );
-	histos->ptRatio->Fill( ptRatio );
-	histos->ptRatio2D->Fill( pMom.perp(), gMom.perp() );
-	histos->dca->Fill( primaryTrack->dcaGlobal().magnitude() );
-	histos->yLocal->Fill( tofPid.yLocal() );
-	histos->zLocal->Fill( tofPid.zLocal() );
+	histos->nHitsFit->Fill( globalTrack->nHitsFit(kTpcId), eventWeight );
+	histos->nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss(kTpcId), eventWeight );
+	histos->nHitsDedx->Fill( globalTrack->nHitsDedx(), eventWeight );
+	histos->ptRatio->Fill( ptRatio, eventWeight );
+	histos->ptRatio2D->Fill( pMom.perp(), gMom.perp(), eventWeight );
+	histos->dca->Fill( primaryTrack->dcaGlobal().magnitude(), eventWeight );
+	histos->yLocal->Fill( tofPid.yLocal(), eventWeight );
+	histos->zLocal->Fill( tofPid.zLocal(), eventWeight );
+	histos->eta->Fill( pMom.pseudoRapidity(), eventWeight );
+	
+	double y = rapidity( pMom.perp(), pMom.pseudoRapidity(), massAssumption );
+	histos->rapidity->Fill( y, eventWeight );
 
-	histos->ptSpectra[ cent9 ]->Fill( pMom.perp() );	
+	histos->eta_phi->Fill( pMom.pseudoRapidity(), pMom.phi(), eventWeight );
+
+	histos->ptSpectra[ cent9 ]->Fill( pMom.perp(), eventWeight );	
 }
 
 //---------------------------------------------------------------------------
@@ -120,7 +130,7 @@ Int_t StRcpQAMaker::Init( ){
 	StRcpSkimmer::Init();
 
 	mTupleFile = new TFile(mTupleFileName.c_str(), "RECREATE");
-	histos = new StRcpQAHistos();
+	histos = new StRcpQAHistos( runRange->min, runRange->max );
 
 	return kStOK;
 }

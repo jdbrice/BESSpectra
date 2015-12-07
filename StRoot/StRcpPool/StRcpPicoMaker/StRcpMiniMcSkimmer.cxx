@@ -18,55 +18,74 @@ StRcpMiniMcSkimmer::StRcpMiniMcSkimmer(int _gid, string _inFile, string _suffix,
 	// 							-1.1, 1.1, .025,
 	// 							0, 5, .05 );
 
-	
-
 	cout << "GEANT ID = " << gid << endl;
 
 	refmultCorrUtil  = CentralityMaker::instance()->getRefMultCorr();
-
-
 
 	// load up the cuts from an xml config
 	cfgCuts = NULL;
 	cfgCuts = new jdb::XmlConfig( "./cuts.xml" );
 
 	// make the cuts variables
-	cut_vZ 			= new jdb::ConfigRange( cfgCuts, "Event.zVertex" );
-	cut_vR 			= new jdb::ConfigRange( cfgCuts, "Event.rVertex" );
-	cut_nTofMatch 	= new jdb::ConfigRange( cfgCuts, "Event.nTofMatch" );
+	cut_vZ = new jdb::ConfigRange( cfgCuts, "Event.zVertex" );
+	cut_vR = new jdb::ConfigRange( cfgCuts, "Event.rVertex" );
+	cut_nTofMatch = new jdb::ConfigRange( cfgCuts, "Event.nTofMatch" );
 
-	cut_nHitsFit 	= new jdb::ConfigRange( cfgCuts, "Track.nHitsFit" );
-	cut_nHitsDedx 	= new jdb::ConfigRange( cfgCuts, "Track.nHitsDedx" );
-	cut_nHitsRatio 	= new jdb::ConfigRange( cfgCuts, "Track.nHitsRatio" );
+	cut_nHitsFit = new jdb::ConfigRange( cfgCuts, "Track.nHitsFit" );
+	cut_nHitsDedx = new jdb::ConfigRange( cfgCuts, "Track.nHitsDedx" );
+	cut_nHitsRatio = new jdb::ConfigRange( cfgCuts, "Track.nHitsRatio" );
 
-	cut_pt 			= new jdb::ConfigRange( cfgCuts, "Track.pt" );
-	cut_ptRatio 	= new jdb::ConfigRange( cfgCuts, "Track.ptRatio" );
-	cut_dca 		= new jdb::ConfigRange( cfgCuts, "Track.dca" );
-	cut_yLocal 		= new jdb::ConfigRange( cfgCuts, "Track.yLocal" );
-	cut_zLocal 		= new jdb::ConfigRange( cfgCuts, "Track.zLocal" );
+	cut_pt = new jdb::ConfigRange( cfgCuts, "Track.pt" );
+	cut_ptRatio = new jdb::ConfigRange( cfgCuts, "Track.ptRatio" );
+	cut_dca = new jdb::ConfigRange( cfgCuts, "Track.dca" );
+	cut_yLocal = new jdb::ConfigRange( cfgCuts, "Track.yLocal" );
+	cut_zLocal = new jdb::ConfigRange( cfgCuts, "Track.zLocal" );
+	cut_rapidity = new jdb::ConfigRange( cfgCuts, "Track.rapidity", -10000, 10000 );
+	cut_pseudorapidity = new jdb::ConfigRange( cfgCuts, "Track.pseudorapidity", -10000, 10000 );
+	massAssumption = cfgCuts->getDouble( "Track.rapidity:mass", 0.13957018 /*pi^+ mass in GeV/c */);
+
+	badRuns = cfgCuts->getIntVector( "BadRuns" );
+	runRange = new jdb::ConfigRange( cfgCuts, "RunRange" );
+	// build the bad run map
+	for ( int rId : badRuns ){
+		badRunMap[ rId ] = true;
+	}
+
 
 	// report
 	cout << endl << "MiniMc Skimmer for " << trackType << " tracks" << endl << endm;
-	cout << "Event Cuts \n\n" << endm;
-	cout << "Z Vertex : ( " << cut_vZ->min  << ", " << cut_vZ->max << " )\n" << endm;
-	cout << "R Vertex : ( " << cut_vR->min  << ", " << cut_vR->max << " )\n" << endm;
-	cout << "nTofMatch : ( " << cut_nTofMatch->min  << ", " << cut_nTofMatch->max << " )\n" << endm;
-
-	cout << "Track Cuts \n\n" << endm;
-	cout << "nHitsFit : ( " << cut_nHitsFit->min  << ", " << cut_nHitsFit->max << " )\n" << endm;
-	cout << "nHitsDedx : ( " << cut_nHitsDedx->min  << ", " << cut_nHitsDedx->max << " )\n" << endm;
-	cout << "nHitsRatio : ( " << cut_nHitsRatio->min  << ", " << cut_nHitsRatio->max << " )\n" << endm;
-	cout << "pt : (" << cut_pt->min << "," << cut_pt->max << " ) \n" << endm;
-	cout << "ptRatio : (" << cut_ptRatio->min << "," << cut_ptRatio->max << " ) \n" << endm;
-	cout << "dca : (" << cut_dca->min << "," << cut_dca->max << " ) \n" << endm;
-	cout << "yLocal : (" << cut_yLocal->min << "," << cut_yLocal->max << " ) \n" << endm;
-	cout << "zLocal : (" << cut_zLocal->min << "," << cut_zLocal->max << " ) \n" << endm;
-
-
-	// create the bad run map - sanity check - first attempt at bad run filtering wasn't working as expected
-	for ( int i = 0; i < StRcpSkimmer::nBadRuns; i++ ){
-		badRunMap[ StRcpSkimmer::badRuns[ i ] ] = true;
+	
+	LOG_INFO << "Processing Runs between " << runRange->min << " --> " << runRange->max << " (inclusive) " << endm; 
+	
+	LOG_INFO << "Excluding " << badRuns.size() << " bad runs " << endm;
+	for ( int i : badRuns ){
+		LOG_INFO << i << ", ";
 	}
+	LOG_INFO << endm << endm;
+
+	LOG_INFO << endl << endl << endm;
+	LOG_INFO << "Event Cuts \n\n" << endm;
+	LOG_INFO << "Z Vertex : ( " << cut_vZ->min  << ", " << cut_vZ->max << " )" << endm;
+	LOG_INFO << "R Vertex : ( " << cut_vR->min  << ", " << cut_vR->max << " )" << endm;
+	LOG_INFO << "nTofMatch : ( " << cut_nTofMatch->min  << ", " << cut_nTofMatch->max << " )" << endm;
+
+	LOG_INFO << "Track Cuts \n\n" << endm;
+	LOG_INFO << "nHitsFit : ( " << cut_nHitsFit->min  << ", " << cut_nHitsFit->max << " )" << endm;
+	LOG_INFO << "nHitsDedx : ( " << cut_nHitsDedx->min  << ", " << cut_nHitsDedx->max << " )" << endm;
+	LOG_INFO << "nHitsRatio : ( " << cut_nHitsRatio->min  << ", " << cut_nHitsRatio->max << " )" << endm;
+	LOG_INFO << "pt : (" << cut_pt->min << "," << cut_pt->max << " ) " << endm;
+	LOG_INFO << "ptRatio : (" << cut_ptRatio->min << "," << cut_ptRatio->max << " ) " << endm;
+	LOG_INFO << "dca : (" << cut_dca->min << "," << cut_dca->max << " ) " << endm;
+	LOG_INFO << "yLocal : (" << cut_yLocal->min << "," << cut_yLocal->max << " ) " << endm;
+	LOG_INFO << "zLocal : (" << cut_zLocal->min << "," << cut_zLocal->max << " ) " << endm;
+	LOG_INFO << "rapidity : (" << cut_rapidity->min << "," << cut_rapidity->max << " ) mass = " << massAssumption << "" << endm;
+	LOG_INFO << "pseudorapidity : (" << cut_pseudorapidity->min << "," << cut_pseudorapidity->max << " ) " << endm;
+	
+	
+	LOG_INFO << "\n\n\n" << endm;
+
+
+	
 
 }
 
