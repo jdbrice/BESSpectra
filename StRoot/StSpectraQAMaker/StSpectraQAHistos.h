@@ -14,10 +14,10 @@
 
 #include <map>
 
-class StRcpQAHistos
+class StSpectraQAHistos
 {
 public:
-	StRcpQAHistos( int firstRun, int lastRun = -1 ){
+	StSpectraQAHistos( int firstRun, int lastRun = -1 ){
 
 
 		// parse out the first and last day of the run
@@ -96,15 +96,16 @@ public:
 		pre_eta_phi 	= new TH2F( "track_pre_eta_phi", "pre #eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 		eta_phi 		= new TH2F( "track_eta_phi", "#eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 
-		trackBeta 	= new TH2F( "trackBeta", "beta", 80, 0, 5, 200, -.5, 3 );
+		beta_p 			= new TH2F( "track_beta_p", "beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
+		pre_beta_p 			= new TH2F( "track_pre_beta_p", "pre beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
 
 		for ( int i = 0; i < 9; i++ ){
-			ptSpectra[ i ] = new TH1F( ("pt_spectra_" + jdb::ts(i)).c_str(), "p_T Spectra", 200, 0, 5  );
+			ptSpectra[ i ] = new TH1F( ("pt_spectra_" + jdb::ts(i)).c_str(), "p_T Spectra", 200, -5, 5  );
 		}
 
 
 	}
-	~StRcpQAHistos();
+	~StSpectraQAHistos();
 
 	/**
 	 * Event Histos
@@ -124,7 +125,7 @@ public:
 	TH1F * nHitsFit, *nHitsDedx, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
 	TH1F *pre_eta, *eta, *pre_rapidity, *rapidity;
 	TH2F * pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
-	TH2F * trackBeta;
+	TH2F * beta_p, *pre_beta_p;
 
 	/**
 	 * Analysis 

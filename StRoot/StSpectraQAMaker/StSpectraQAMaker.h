@@ -1,19 +1,19 @@
 #ifndef ST_RCP_QA_MAKER_H
 #define ST_RCP_QA_MAKER_H
 
-#include "StRcpSkimmer.h"
-#include "StRcpQAHistos.h"
+#include "StSpectraSkimmer/StSpectraSkimmer.h"
+#include "StSpectraQAMaker/StSpectraQAHistos.h"
 
-class StRcpQAMaker : public StRcpSkimmer {
+class StSpectraQAMaker : public StSpectraSkimmer {
  public:
-	StRcpQAMaker(const Char_t *name, const Char_t *outname);
-	~StRcpQAMaker();
+	StSpectraQAMaker(const Char_t *name, const Char_t *outname);
+	~StSpectraQAMaker();
 
 	Int_t  Init();
 	
 private:
 	
-	StRcpQAHistos * histos;
+	StSpectraQAHistos * histos;
 
 	virtual void passTrackCut( string name );
 	virtual void preTrackCuts( StMuTrack *primaryTrack );
@@ -27,9 +27,9 @@ private:
 	
 
 	virtual const char *GetCVS() const 
-		{static const char cvs[]="Tag $Name:  $ $Id: StRcpQAMaker.h, $ built "  __DATE__  " "  __TIME__ ; return cvs;}
+		{static const char cvs[]="Tag $Name:  $ $Id: StSpectraQAMaker.h, $ built "  __DATE__  " "  __TIME__ ; return cvs;}
 
-	ClassDef(StRcpQAMaker,1)
+	ClassDef(StSpectraQAMaker,1)
 };
 
 #endif

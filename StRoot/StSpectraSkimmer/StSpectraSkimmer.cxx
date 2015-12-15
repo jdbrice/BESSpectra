@@ -1,4 +1,4 @@
-#include "StRcpSkimmer.h"
+#include "StSpectraSkimmer/StSpectraSkimmer.h"
 
 //// StRoot
 // StMuDst
@@ -16,8 +16,8 @@
 /**
  * Processes the MuDst
  */
-void StRcpSkimmer::processMuDst() {
-	//LOG_INFO << "StRcpSkimmer::processMuDst()" << endm;
+void StSpectraSkimmer::processMuDst() {
+	//LOG_INFO << "StSpectraSkimmer::processMuDst()" << endm;
 
 	StMuDstMaker *muDstMaker = (StMuDstMaker*) GetMaker( "MuDst" );
 
@@ -86,17 +86,17 @@ void StRcpSkimmer::processMuDst() {
 
 }
 
-void StRcpSkimmer::postTrackLoop( Int_t nPrimaryGoodTracks ){
+void StSpectraSkimmer::postTrackLoop( Int_t nPrimaryGoodTracks ){
 
 
 }
 
 
-void StRcpSkimmer::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
-	//LOG_INFO << "StRcpSkimmer::analyzeTrack" << endm;
+void StSpectraSkimmer::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
+	//LOG_INFO << "StSpectraSkimmer::analyzeTrack" << endm;
 }
 
-Int_t StRcpSkimmer::nTofMatchedTracksA(){
+Int_t StSpectraSkimmer::nTofMatchedTracksA(){
 
 	Int_t nPrimary 	= muDst->primaryTracks()->GetEntries();
 	Int_t nTofMatched = 0;
@@ -124,21 +124,21 @@ Int_t StRcpSkimmer::nTofMatchedTracksA(){
 /**
  * Called before main event cuts but after trigger selection
  */
-void StRcpSkimmer::preEventCuts(){
-	//LOG_INFO << "StRcpSkimmer::preEventCuts" << endm;
+void StSpectraSkimmer::preEventCuts(){
+	//LOG_INFO << "StSpectraSkimmer::preEventCuts" << endm;
 
 }
 
 /**
  * Called after main event cuts
  */
-void StRcpSkimmer::postEventCuts(){
-	//LOG_INFO << "StRcpSkimmer::postEventCuts" << endm;
+void StSpectraSkimmer::postEventCuts(){
+	//LOG_INFO << "StSpectraSkimmer::postEventCuts" << endm;
 
 
 }
 
-void StRcpSkimmer::passEventCut( string name ){
+void StSpectraSkimmer::passEventCut( string name ){
 	
 }
 
@@ -146,8 +146,8 @@ void StRcpSkimmer::passEventCut( string name ){
  * Apply Event cuts
  * @return [description]
  */
-Bool_t StRcpSkimmer::keepEvent(){
-	//LOG_INFO << "StRcpSkimmer::keepEvent" << endm;
+Bool_t StSpectraSkimmer::keepEvent(){
+	//LOG_INFO << "StSpectraSkimmer::keepEvent" << endm;
 
 	passEventCut( "All");
 	
@@ -238,15 +238,15 @@ Bool_t StRcpSkimmer::keepEvent(){
 
 
 
-void StRcpSkimmer::passTrackCut( string name ){
+void StSpectraSkimmer::passTrackCut( string name ){
 
 }
 
-void StRcpSkimmer::preTrackCuts(StMuTrack *primaryTrack ){
+void StSpectraSkimmer::preTrackCuts(StMuTrack *primaryTrack ){
 
 }
-void StRcpSkimmer::postTrackCuts(StMuTrack *primaryTrack ){
-	//LOG_INFO << "StRcpSkimmer::postTrackCuts" << endm;
+void StSpectraSkimmer::postTrackCuts(StMuTrack *primaryTrack ){
+	//LOG_INFO << "StSpectraSkimmer::postTrackCuts" << endm;
 }
 
 /**
@@ -254,8 +254,8 @@ void StRcpSkimmer::postTrackCuts(StMuTrack *primaryTrack ){
  * @param  		iNode - Primary Track index
  * @return      true - keep track
  */
-Bool_t StRcpSkimmer::keepTrack( Int_t iNode ){
-	//LOG_INFO << "StRcpSkimmer::keepTrack( " << iNode << " )" << endm;
+Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
+	//LOG_INFO << "StSpectraSkimmer::keepTrack( " << iNode << " )" << endm;
 
 	StMuTrack*	primaryTrack 	= (StMuTrack*)muDst->primaryTracks(iNode);
 	passTrackCut("All");
@@ -326,12 +326,12 @@ Bool_t StRcpSkimmer::keepTrack( Int_t iNode ){
 
 
 
-ClassImp(StRcpSkimmer)
+ClassImp(StSpectraSkimmer)
 
 /**
  * Creates the Maker
  */
-StRcpSkimmer::StRcpSkimmer( const Char_t *name="rcpSkimmer", const Char_t *outname="rcp.skim.root") : StMaker(name) {
+StSpectraSkimmer::StSpectraSkimmer( const Char_t *name="rcpSkimmer", const Char_t *outname="rcp.skim.root") : StMaker(name) {
 	// the output filename
 	mTupleFileName = outname;
 
@@ -416,7 +416,7 @@ StRcpSkimmer::StRcpSkimmer( const Char_t *name="rcpSkimmer", const Char_t *outna
 /**
  * Destructor
  */
-StRcpSkimmer::~StRcpSkimmer( ){ 
+StSpectraSkimmer::~StSpectraSkimmer( ){ 
 
 	if ( NULL != cfgCuts )
 		delete cfgCuts;
@@ -427,7 +427,7 @@ StRcpSkimmer::~StRcpSkimmer( ){
 /**
  * Initialise the Maker
  */
-Int_t StRcpSkimmer::Init( ){
+Int_t StSpectraSkimmer::Init( ){
 
 	refmultCorrUtil  = CentralityMaker::instance()->getRefMultCorr();
 
@@ -438,23 +438,23 @@ Int_t StRcpSkimmer::Init( ){
 }
 
 
-Int_t StRcpSkimmer::InitRun( int runnumber ) {
+Int_t StSpectraSkimmer::InitRun( int runnumber ) {
 
 	return kStOK;
 }
 
-Int_t StRcpSkimmer::FinishRun( int runnumber ) {
+Int_t StSpectraSkimmer::FinishRun( int runnumber ) {
   	return kStOK;
 }
 
 /// write and close the ntuple file
-Int_t StRcpSkimmer::Finish() {
+Int_t StSpectraSkimmer::Finish() {
 
 	if ( (string)"" != mTupleFileName && mTupleFile ){
 		mTupleFile->Write();
 		mTupleFile->Close();
 
-		LOG_INFO  << "StRcpSkimmer::Finish() ntuple file " << mTupleFileName  << " closed." << endm;
+		LOG_INFO  << "StSpectraSkimmer::Finish() ntuple file " << mTupleFileName  << " closed." << endm;
 
 	}
 
@@ -465,7 +465,7 @@ Int_t StRcpSkimmer::Finish() {
 /**
  * Called for each event 
  */
-Int_t StRcpSkimmer::Make(){
+Int_t StSpectraSkimmer::Make(){
 
   processMuDst();
 

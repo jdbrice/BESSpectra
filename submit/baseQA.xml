@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<job maxFilesPerProcess="1" filesPerHour="60" fileListSyntax="xrootd">
+<job maxFilesPerProcess="1" filesPerHour="12" fileListSyntax="xrootd">
 	
 	<command>
 		starver SL14i
@@ -7,12 +7,12 @@
 
 	</command>
 
-	<stdout URL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/log/$JOBID.out" />
-	<stderr URL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/log/$JOBID.err" />
+	<stdout URL="file:/star/institutions/rice/jdb/BesSpectra/setA/log/$JOBID.out" />
+	<stderr URL="file:/star/institutions/rice/jdb/BesSpectra/setA/log/$JOBID.err" />
 	
 	<input URL="filelist:/star/u/jdb/work/BESSpectra/list/small.lis" nFiles="20000" />
 
-	<output fromScratch="*" toURL="file:/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/"/>
+	<output fromScratch="*" toURL="file:/star/institutions/rice/jdb/BesSpectra/setA/"/>
 
 	<SandBox>
  		<Package>
@@ -24,6 +24,6 @@
  	</SandBox>
 
 	<Generator> 
- 		<Location>/star/institutions/rice/jdb/run14/auau15/rcp/rcpData/setA/gen</Location> 
+ 		<Location>/star/institutions/rice/jdb/BesSpectra/setA/gen</Location> 
  	</Generator> 
 </job>

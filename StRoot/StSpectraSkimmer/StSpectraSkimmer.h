@@ -20,10 +20,10 @@ class StMuDst;
 class StMuEvent;
 class StMuTrack;
 
-class StRcpSkimmer : public StMaker {
+class StSpectraSkimmer : public StMaker {
  public:
-	StRcpSkimmer(const Char_t *name, const Char_t *outname);
-	~StRcpSkimmer();
+	StSpectraSkimmer(const Char_t *name, const Char_t *outname);
+	~StSpectraSkimmer();
 	 
 	Int_t  Init();
 	Int_t  InitRun(int runnumber);
@@ -113,9 +113,9 @@ protected:
 	Bool_t  doPrintCpuInfo; 		//! control debug timing data
 
 	virtual const char *GetCVS() const 
-		{static const char cvs[]="Tag $Name:  $ $Id: StRcpSkimmer.h, $ built "  __DATE__  "  "  __TIME__ ; return cvs;}
+		{static const char cvs[]="Tag $Name:  $ $Id: StSpectraSkimmer.h, $ built "  __DATE__  "  "  __TIME__ ; return cvs;}
 
-	ClassDef(StRcpSkimmer,1)
+	ClassDef(StSpectraSkimmer,1)
 };
 
 #endif

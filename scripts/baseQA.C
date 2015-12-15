@@ -22,7 +22,12 @@ void baseQA( const Char_t *fileList = "small.lis",
     gSystem ->Load("StMiniMcEvent");
 	gSystem->Load("StRefMultCorr");
 	gSystem->Load("StRooBarb");
-	gSystem->Load("StRcpPicoMaker");
+	
+
+	gSystem->Load("StSpectraSkimmer");
+	gSystem->Load("StSpectraPicoMaker");
+	gSystem->Load("StSpectraQAMaker");
+
 	
 	// Create Chain
 	chain  = new StChain("StChain");
@@ -30,8 +35,8 @@ void baseQA( const Char_t *fileList = "small.lis",
 	// create the StMuDstMaker
 	StMuDstMaker *muDstMaker = new StMuDstMaker(  0, 0, "", fileList, "MuDst.root", maxFiles );
 
-	StRcpQAMaker *rcpQA = new StRcpQAMaker("rcpQA", ("qa_" + string(name) ).c_str() );
-	// StRcpPicoMaker *rcpPico = new StRcpPicoMaker("rcpPico", ("tuple_" + string(ntuplename)).c_str() ) ;
+	StSpectraQAMaker *rcpQA = new StSpectraQAMaker("spectraQA", ("qa_" + string(name) ).c_str() );
+	// StSpectraPicoMaker *rcpPico = new StSpectraPicoMaker("spectraPico", ("tuple_" + string(ntuplename)).c_str() ) ;
 
 	// Initialize chain
 	Int_t iInit = chain->Init();

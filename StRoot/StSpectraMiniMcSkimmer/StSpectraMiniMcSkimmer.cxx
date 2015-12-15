@@ -1,9 +1,9 @@
-#include "StRcpMiniMcSkimmer.h"
-#include "StRcpSkimmer.h"
+#include "StSpectraMiniMcSkimmer.h"
+#include "StSpectraSkimmer/StSpectraSkimmer.h"
 
-StRcpMiniMcSkimmer::StRcpMiniMcSkimmer(int _gid, string _inFile, string _suffix, string _trackType, int _maxFiles ){
+StSpectraMiniMcSkimmer::StSpectraMiniMcSkimmer(int _gid, string _inFile, string _suffix, string _trackType, int _maxFiles ){
 
-	cout << "[StRcpMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
+	cout << "[StSpectraMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
 
 	trackType = _trackType;
 	gid = _gid;
@@ -89,8 +89,8 @@ StRcpMiniMcSkimmer::StRcpMiniMcSkimmer(int _gid, string _inFile, string _suffix,
 
 }
 
-StRcpMiniMcSkimmer::~StRcpMiniMcSkimmer(){
-	cout << "[StRcpMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
+StSpectraMiniMcSkimmer::~StSpectraMiniMcSkimmer(){
+	cout << "[StSpectraMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
 	
 	dataFile->Write();
 
@@ -99,8 +99,8 @@ StRcpMiniMcSkimmer::~StRcpMiniMcSkimmer(){
 }
 
 
-void StRcpMiniMcSkimmer::loadFileList( string fList, int maxFiles ){
-	cout << "[StRcpMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
+void StSpectraMiniMcSkimmer::loadFileList( string fList, int maxFiles ){
+	cout << "[StSpectraMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
 	
 	cout << "filelist : " << fList << endl;
 	
@@ -118,11 +118,11 @@ void StRcpMiniMcSkimmer::loadFileList( string fList, int maxFiles ){
 
 	inFile.close();
 	cout << "\tLoaded " << fRead << " files" << endl;
-	cout << "[StRcpMiniMcSkimmer::~" << __FUNCTION__ << "]" << endl;
+	cout << "[StSpectraMiniMcSkimmer::~" << __FUNCTION__ << "]" << endl;
 }
 
-void StRcpMiniMcSkimmer::make( ){
-	cout << "[StRcpMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
+void StSpectraMiniMcSkimmer::make( ){
+	cout << "[StSpectraMiniMcSkimmer::" << __FUNCTION__ << "]" << endl;
 
 	event = 0;
 	miniMcTree->SetBranchAddress( "StMiniMcEvent", &event );
@@ -179,12 +179,12 @@ void StRcpMiniMcSkimmer::make( ){
 	}
 
 
-	cout << "[StRcpMiniMcSkimmer::~" << __FUNCTION__ << "]" << endl;
+	cout << "[StSpectraMiniMcSkimmer::~" << __FUNCTION__ << "]" << endl;
 }
 
 
 
-void StRcpMiniMcSkimmer::analyzeMcTrack( StTinyMcTrack * track, int iGood ){
+void StSpectraMiniMcSkimmer::analyzeMcTrack( StTinyMcTrack * track, int iGood ){
 	
 	cout << "HELLO" << endl;
 	double y = rapidity( track->pMc(), track->pzMc() );
@@ -192,13 +192,13 @@ void StRcpMiniMcSkimmer::analyzeMcTrack( StTinyMcTrack * track, int iGood ){
 
 
 }
-void StRcpMiniMcSkimmer::analyzeTrackPair( StMiniMcPair * pair, int iGood ){
+void StSpectraMiniMcSkimmer::analyzeTrackPair( StMiniMcPair * pair, int iGood ){
 
 }
 
 
 
-bool StRcpMiniMcSkimmer::keepEvent(){
+bool StSpectraMiniMcSkimmer::keepEvent(){
 
 
 	if ( event->vertexZ() > cut_vZ->max  || event->vertexZ() < cut_vZ->min)
@@ -245,8 +245,8 @@ bool StRcpMiniMcSkimmer::keepEvent(){
 
 
 
-Bool_t StRcpMiniMcSkimmer::keepTrack( StMiniMcPair * track ){
-	//LOG_INFO << "StRcpMiniMcSkimmer::keepTrack( " << iNode << " )" << endm;
+Bool_t StSpectraMiniMcSkimmer::keepTrack( StMiniMcPair * track ){
+	//LOG_INFO << "StSpectraMiniMcSkimmer::keepTrack( " << iNode << " )" << endm;
 
 	passTrackCut("All");
 
@@ -301,7 +301,7 @@ Bool_t StRcpMiniMcSkimmer::keepTrack( StMiniMcPair * track ){
 
 
 
-double StRcpMiniMcSkimmer::plcMass( ){
+double StSpectraMiniMcSkimmer::plcMass( ){
 
 	if ( 8 == gid || 9 == gid )
 		return 0.1395702; 			// pi+ or pi-
@@ -313,7 +313,7 @@ double StRcpMiniMcSkimmer::plcMass( ){
 	return -1;
 }
 
-int StRcpMiniMcSkimmer::plcCharge(){
+int StSpectraMiniMcSkimmer::plcCharge(){
 	switch ( gid ) {
 
 		case 8 : // pi +
@@ -334,7 +334,7 @@ int StRcpMiniMcSkimmer::plcCharge(){
 	return 0;
 }
 
-string StRcpMiniMcSkimmer::plcName(  ){
+string StSpectraMiniMcSkimmer::plcName(  ){
 	if ( 8 == gid )
 		return "Pi_p";
 	if ( 9 == gid )
@@ -354,7 +354,7 @@ string StRcpMiniMcSkimmer::plcName(  ){
 
 
 
-double StRcpMiniMcSkimmer::rapidity( double p, double pz ){
+double StSpectraMiniMcSkimmer::rapidity( double p, double pz ){
 
 	double mass = plcMass();
 	double energy = sqrt( p*p + mass * mass );

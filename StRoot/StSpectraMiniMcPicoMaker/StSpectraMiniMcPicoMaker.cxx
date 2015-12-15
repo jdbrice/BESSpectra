@@ -1,17 +1,17 @@
-#include "StRcpMiniMcPicoMaker.h"
+#include "StSpectraMiniMcPicoMaker.h"
 
-ClassImp(StRcpMiniMcPicoMaker);
+ClassImp(StSpectraMiniMcPicoMaker);
 
 
-StRcpMiniMcPicoMaker::StRcpMiniMcPicoMaker(int _gid, string _inFile, string _suffix, string _trackType, int _maxFiles)
-	: StRcpMiniMcSkimmer( _gid, _inFile, _suffix, _trackType, _maxFiles ) {
+StSpectraMiniMcPicoMaker::StSpectraMiniMcPicoMaker(int _gid, string _inFile, string _suffix, string _trackType, int _maxFiles)
+	: StSpectraMiniMcSkimmer( _gid, _inFile, _suffix, _trackType, _maxFiles ) {
 
 
 	bookNtuples();
 }
 
 
-void StRcpMiniMcPicoMaker::postEventCuts(){
+void StSpectraMiniMcPicoMaker::postEventCuts(){
 	mData.runId 		= runId;
 	mData.corrRefMult 	= corrRefMult;
 	mData.weight 		= eventWeight;
@@ -19,8 +19,8 @@ void StRcpMiniMcPicoMaker::postEventCuts(){
 	mData.bin16 		= cent16;
 }
 
-void StRcpMiniMcPicoMaker::analyzeTrackPair( StMiniMcPair * track, Int_t iGoodTrack ){
-	//LOG_INFO << "StRcpMiniMcPicoMaker::analyzeTrack( " << iNode << ", " << iGoodTrack << ") " << endm;
+void StSpectraMiniMcPicoMaker::analyzeTrackPair( StMiniMcPair * track, Int_t iGoodTrack ){
+	//LOG_INFO << "StSpectraMiniMcPicoMaker::analyzeTrack( " << iNode << ", " << iGoodTrack << ") " << endm;
 
 
 	mData.pP[ iGoodTrack ] 			= track->pPr();
@@ -47,8 +47,8 @@ void StRcpMiniMcPicoMaker::analyzeTrackPair( StMiniMcPair * track, Int_t iGoodTr
 }
 
 
-void StRcpMiniMcPicoMaker::analyzeMcTrack( StTinyMcTrack * track, Int_t iGoodTrack ){
-	//cout << "StRcpMiniMcPicoMaker::analyzeTrack( " << track << ", " << iGoodTrack << ") " << endl;
+void StSpectraMiniMcPicoMaker::analyzeMcTrack( StTinyMcTrack * track, Int_t iGoodTrack ){
+	//cout << "StSpectraMiniMcPicoMaker::analyzeTrack( " << track << ", " << iGoodTrack << ") " << endl;
 
 
 	mData.pP[ iGoodTrack ] 			= track->pMc();
@@ -74,8 +74,8 @@ void StRcpMiniMcPicoMaker::analyzeMcTrack( StTinyMcTrack * track, Int_t iGoodTra
 	mData.dedx[ iGoodTrack ] 		= (UShort_t)10;
 }
 
-void StRcpMiniMcPicoMaker::postTrackLoop(Int_t nPrimaryGood){
-	//cout << "StRcpMiniMcPicoMaker::postTrackLoop( " << nPrimaryGood << ") " << endl;
+void StSpectraMiniMcPicoMaker::postTrackLoop(Int_t nPrimaryGood){
+	//cout << "StSpectraMiniMcPicoMaker::postTrackLoop( " << nPrimaryGood << ") " << endl;
 	
 	mData.nTracks = nPrimaryGood;
 	mTree->Fill();
@@ -84,7 +84,7 @@ void StRcpMiniMcPicoMaker::postTrackLoop(Int_t nPrimaryGood){
 /**
  * Initialize Tree Structure
  */
-void StRcpMiniMcPicoMaker::bookNtuples(){
+void StSpectraMiniMcPicoMaker::bookNtuples(){
 
 
 	mTree = new TTree("rcpPicoDst","Rcp Pid Spectra Data");
@@ -121,6 +121,6 @@ void StRcpMiniMcPicoMaker::bookNtuples(){
 /**
  * Destructor
  */
-StRcpMiniMcPicoMaker::~StRcpMiniMcPicoMaker( ){ 
+StSpectraMiniMcPicoMaker::~StSpectraMiniMcPicoMaker( ){ 
 
 }

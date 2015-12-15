@@ -1,4 +1,4 @@
-#include "StRcpPicoMaker.h"
+#include "StSpectraPicoMaker/StSpectraPicoMaker.h"
 
 
 #include "StMuDSTMaker/COMMON/StMuUtilities.h"
@@ -8,10 +8,10 @@
 #include "StMuDSTMaker/COMMON/StMuDstMaker.h"
 #include "StMuDSTMaker/COMMON/StMuTrack.h"
 
-ClassImp(StRcpPicoMaker);
+ClassImp(StSpectraPicoMaker);
 
 
-void StRcpPicoMaker::postEventCuts(){
+void StSpectraPicoMaker::postEventCuts(){
 	mData.runId 		= runId;
 	mData.corrRefMult 	= corrRefMult;
 	mData.weight 		= eventWeight;
@@ -20,8 +20,8 @@ void StRcpPicoMaker::postEventCuts(){
 	mData.nTofMatchedTracks = nTofMatchedTracks;
 }
 
-void StRcpPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
-	//LOG_INFO << "StRcpPicoMaker::analyzeTrack( " << iNode << ", " << iGoodTrack << ") " << endm;
+void StSpectraPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
+	//LOG_INFO << "StSpectraPicoMaker::analyzeTrack( " << iNode << ", " << iGoodTrack << ") " << endm;
 
 	StMuTrack*	tPrimary 			= (StMuTrack*)muDst->primaryTracks(iNode);	
 	StMuTrack*	tGlobal 			= (StMuTrack*)tPrimary->globalTrack();
@@ -32,7 +32,7 @@ void StRcpPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 	StThreeVectorF gMom 			= tGlobal->momentum();
 
 	mData.pP[ iGoodTrack ] 			= pMom.magnitude();
-	mData.pPt[ iGoodTrack ] 		= pMom.perp() * tGlobal->charge();
+	mData.pPt[ iGoodTrack ] 		= pMom.perp() * tPrimary->charge();
 	mData.gPt[ iGoodTrack ] 		= gMom.perp();
 	mData.pEta[ iGoodTrack ] 		= pMom.pseudoRapidity();
 
@@ -70,8 +70,8 @@ void StRcpPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 	mData.dedx[ iGoodTrack ] 			= (UShort_t) ((tGlobal->dEdx()*1e6) * 1000);
 }
 
-void StRcpPicoMaker::postTrackLoop(Int_t nPrimaryGood){
-	//LOG_INFO << "StRcpPicoMaker::postTrackLoop( " << nPrimaryGood << ") " << endm;
+void StSpectraPicoMaker::postTrackLoop(Int_t nPrimaryGood){
+	//LOG_INFO << "StSpectraPicoMaker::postTrackLoop( " << nPrimaryGood << ") " << endm;
 	mData.nTracks = nPrimaryGood;
 	mTree->Fill();
 }
@@ -79,12 +79,12 @@ void StRcpPicoMaker::postTrackLoop(Int_t nPrimaryGood){
 /**
  * Initialize Tree Structure
  */
-void StRcpPicoMaker::bookNtuples(){
+void StSpectraPicoMaker::bookNtuples(){
 
 
 	mTupleFile = new TFile(mTupleFileName.c_str(), "RECREATE");
 
-	mTree = new TTree("rcpPicoDst","Rcp Pid Spectra Data");
+	mTree = new TTree("SpectraPicoDst","Pid Spectra Data");
 	mTree->SetAutoSave(10000);
 	mTree->Branch("runId",				&mData.runId,"run/I");
 	mTree->Branch("bin16",				&mData.bin16,"bin16/s");
@@ -119,23 +119,23 @@ void StRcpPicoMaker::bookNtuples(){
 /**
  * Creates the Maker
  */
-StRcpPicoMaker::StRcpPicoMaker( const Char_t *name="rcpPicoMaker", const Char_t *outname="rcpPico.root") : StRcpSkimmer(name, outname) {
+StSpectraPicoMaker::StSpectraPicoMaker( const Char_t *name="SpectraPicoMaker", const Char_t *outname="SpectraPico.root") : StSpectraSkimmer(name, outname) {
 	
 }
 
 /**
  * Destructor
  */
-StRcpPicoMaker::~StRcpPicoMaker( ){ 
+StSpectraPicoMaker::~StSpectraPicoMaker( ){ 
 
 }
 
 /**
  * Initializes the Maker
  */
-Int_t StRcpPicoMaker::Init( ){
+Int_t StSpectraPicoMaker::Init( ){
 
-	StRcpSkimmer::Init();
+	StSpectraSkimmer::Init();
 
 	if ( (string)"" != mTupleFileName ) 
 		bookNtuples();

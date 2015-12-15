@@ -1,9 +1,9 @@
-#ifndef ST_RCP_TREE_DATA_H
-#define ST_RCP_TREE_DATA_H
+#ifndef ST_SPECTRA_TREE_DATA_H
+#define ST_SPECTRA_TREE_DATA_H
 
 const Int_t kMaxTracks = 10000;
 
-struct StRcpTreeData {
+struct StSpectraTreeData {
 	
 	Int_t       runId;
 	Float_t     weight;						// event weight

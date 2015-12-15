@@ -1,4 +1,7 @@
-#include "StRcpQAMaker.h"
+
+#include "StSpectraQAMaker/StSpectraQAMaker.h"
+
+// MuDst
 #include "StMuDSTMaker/COMMON/StMuUtilities.h"
 #include "StMuDSTMaker/COMMON/StMuPrimaryVertex.h"
 #include "StMuDSTMaker/COMMON/StMuDst.h"
@@ -7,13 +10,13 @@
 #include "StMuDSTMaker/COMMON/StMuTrack.h"
 
 
-ClassImp(StRcpQAMaker);
+ClassImp(StSpectraQAMaker);
 
-void StRcpQAMaker::postTrackLoop( Int_t nPrimaryGood ){
+void StSpectraQAMaker::postTrackLoop( Int_t nPrimaryGood ){
 	histos->nTrack_refMult->Fill( corrRefMult, nPrimaryGood  );
 }
 
-void StRcpQAMaker::passEventCut( string name ){
+void StSpectraQAMaker::passEventCut( string name ){
 	histos->eventCuts->Fill( name.c_str(), 1 );
 
 	if ( "Trigger" == name || "BadRun" == name ){
@@ -31,11 +34,11 @@ void StRcpQAMaker::passEventCut( string name ){
 	}
 }
 
-void StRcpQAMaker::passTrackCut( string name ){
+void StSpectraQAMaker::passTrackCut( string name ){
 	histos->trackCuts->Fill( name.c_str(), 1 );
 }
 
-void StRcpQAMaker::preEventCuts(){
+void StSpectraQAMaker::preEventCuts(){
 	StMuEvent *muEvent = muDst->event();
 	int runId = muEvent->runId();
 
@@ -47,7 +50,7 @@ void StRcpQAMaker::preEventCuts(){
 	histos->pre_nTofMatchA_corrRefMult->Fill( nTofMatchedTracks, corrRefMult );
 }
 
-void StRcpQAMaker::postEventCuts(){
+void StSpectraQAMaker::postEventCuts(){
 	StMuEvent *muEvent = muDst->event();
 
 	histos->vZ->Fill( pZ );
@@ -61,7 +64,7 @@ void StRcpQAMaker::postEventCuts(){
 	histos->nTofMatchA_corrRefMult->Fill( nTofMatchedTracks, corrRefMult );
 }
 
-void StRcpQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
+void StSpectraQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 	const StMuTrack *globalTrack = primaryTrack->globalTrack();
 	StMuBTofPidTraits tofPid = globalTrack->btofPidTraits();
 
@@ -69,9 +72,9 @@ void StRcpQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
-	histos->pre_nHitsFit->Fill( globalTrack->nHitsFit(kTpcId), eventWeight );
-	histos->pre_nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss(kTpcId), eventWeight );
-	histos->pre_nHitsDedx->Fill( globalTrack->nHitsDedx(), eventWeight );
+	histos->pre_nHitsFit->Fill( primaryTrack->nHitsFit(kTpcId), eventWeight );
+	histos->pre_nHitsFitOverPoss->Fill( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId), eventWeight );
+	histos->pre_nHitsDedx->Fill( primaryTrack->nHitsDedx(), eventWeight );
 	histos->pre_ptRatio->Fill( ptRatio, eventWeight );
 	histos->pre_ptRatio2D->Fill( pMom.perp(), gMom.perp(), eventWeight );
 	histos->pre_dca->Fill( primaryTrack->dcaGlobal().magnitude(), eventWeight );
@@ -83,10 +86,10 @@ void StRcpQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 	histos->pre_eta_phi->Fill( pMom.pseudoRapidity(), pMom.phi(), eventWeight );
 
 
-	histos->trackBeta->Fill( pMom.mag(), 1.0 / tofPid.beta(), eventWeight );
+	histos->pre_beta_p->Fill( pMom.mag() * primaryTrack->charge(), 1.0 / tofPid.beta(), eventWeight );
 }
 
-void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
+void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 
 	const StMuTrack *globalTrack = primaryTrack->globalTrack();
 	StMuBTofPidTraits tofPid = globalTrack->btofPidTraits();
@@ -95,9 +98,9 @@ void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
-	histos->nHitsFit->Fill( globalTrack->nHitsFit(kTpcId), eventWeight );
-	histos->nHitsFitOverPoss->Fill( (float)globalTrack->nHitsFit(kTpcId) / globalTrack->nHitsPoss(kTpcId), eventWeight );
-	histos->nHitsDedx->Fill( globalTrack->nHitsDedx(), eventWeight );
+	histos->nHitsFit->Fill( primaryTrack->nHitsFit(kTpcId), eventWeight );
+	histos->nHitsFitOverPoss->Fill( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId), eventWeight );
+	histos->nHitsDedx->Fill( primaryTrack->nHitsDedx(), eventWeight );
 	histos->ptRatio->Fill( ptRatio, eventWeight );
 	histos->ptRatio2D->Fill( pMom.perp(), gMom.perp(), eventWeight );
 	histos->dca->Fill( primaryTrack->dcaGlobal().magnitude(), eventWeight );
@@ -110,27 +113,29 @@ void StRcpQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 
 	histos->eta_phi->Fill( pMom.pseudoRapidity(), pMom.phi(), eventWeight );
 
-	histos->ptSpectra[ cent9 ]->Fill( pMom.perp(), eventWeight );	
+	histos->beta_p->Fill( pMom.mag() * primaryTrack->charge(), 1.0 / tofPid.beta(), eventWeight );
+
+	histos->ptSpectra[ cent9 ]->Fill( pMom.perp() * primaryTrack->charge(), eventWeight );	
 }
 
 //---------------------------------------------------------------------------
 /// constructor sets default parameters
-StRcpQAMaker::StRcpQAMaker( const Char_t *name="rcpQAMaker", const Char_t *outname="rcpQA.root") : StRcpSkimmer(name, outname) {
+StSpectraQAMaker::StSpectraQAMaker( const Char_t *name="rcpQAMaker", const Char_t *outname="SpectraQA.root") : StSpectraSkimmer(name, outname) {
 	
 }
 
 /// default empty destructor
-StRcpQAMaker::~StRcpQAMaker( ){ 
+StSpectraQAMaker::~StSpectraQAMaker( ){ 
 
 }
 
 
-Int_t StRcpQAMaker::Init( ){
+Int_t StSpectraQAMaker::Init( ){
 
-	StRcpSkimmer::Init();
+	StSpectraSkimmer::Init();
 
 	mTupleFile = new TFile(mTupleFileName.c_str(), "RECREATE");
-	histos = new StRcpQAHistos( runRange->min, runRange->max );
+	histos = new StSpectraQAHistos( runRange->min, runRange->max );
 
 	return kStOK;
 }

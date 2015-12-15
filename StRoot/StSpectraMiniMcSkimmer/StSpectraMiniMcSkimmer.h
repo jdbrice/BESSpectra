@@ -1,5 +1,5 @@
-#ifndef ST_RCP_MINIMC_SKIMMER_H
-#define ST_RCP_MINIMC_SKIMMER_H
+#ifndef ST_SPECTRA_MINIMC_SKIMMER_H
+#define ST_SPECTRA_MINIMC_SKIMMER_H
 
 //STAR
 #include "StMiniMcEvent/StMiniMcEvent.h"
@@ -20,17 +20,17 @@ using namespace std;
 #include "StRefMultCorr/StRefMultCorr.h"
 #include "StRefMultCorr/CentralityMaker.h"
 
-// StRcpPicoMaker
-#include "StRcpTreeData.h"
+// StSpectraPicoMaker
+#include "StSpectraPicoMaker/StSpectraTreeData.h"
 
 // roobarb
 #include "StRooBarb/XmlConfig.h"
 #include "StRooBarb/ConfigRange.h"
 
-class StRcpMiniMcSkimmer {
+class StSpectraMiniMcSkimmer {
  public:
-	StRcpMiniMcSkimmer(int _gid, string _inFile, string _suffix, string _trackType = "mc", int _maxFiles = -1); // trackType = 'mc' or 'rc'
-	~StRcpMiniMcSkimmer();
+	StSpectraMiniMcSkimmer(int _gid, string _inFile, string _suffix, string _trackType = "mc", int _maxFiles = -1); // trackType = 'mc' or 'rc'
+	~StSpectraMiniMcSkimmer();
 
 
 	void make(  ); 
@@ -102,9 +102,9 @@ protected:
 	StRefMultCorr* refmultCorrUtil;
 
 	virtual const char *GetCVS() const 
-		{static const char cvs[]="Tag $Name:  $ $Id: StRcpMiniMcSkimmer.h, $ built " __DATE__ " " __TIME__ ; return cvs;}
+		{static const char cvs[]="Tag $Name:  $ $Id: StSpectraMiniMcSkimmer.h, $ built " __DATE__ " " __TIME__ ; return cvs;}
 
-	ClassDef(StRcpMiniMcSkimmer,1)
+	ClassDef(StSpectraMiniMcSkimmer,1)
 };
 
 #endif
