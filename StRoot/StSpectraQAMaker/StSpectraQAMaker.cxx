@@ -25,23 +25,24 @@ void StSpectraQAMaker::passEventCut( string name, bool allCuts  ){
 	// Fill the histos for passing this individual cut 
 	passSingleEventCut( name );
 	
+	if ( "Trigger" == name || "BadRun" == name ){
+		StMuEvent *muEvent = muDst->event();
+		int runId = muEvent->runId();	
+
+		int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
+		int drn = (runId - (runRange->min + day * 1000) ); // run in day
+
+		if ( "Trigger" == name ){
+			histos->pre_runIds->Fill( day, drn );
+		} else if ( "BadRun" == name ){
+			histos->runIds->Fill( day, drn );
+		} 
+	}
+
+	
 	// Passed this cut and all previous cuts
 	if ( allCuts ){
 		histos->eventCuts->Fill( name.c_str(), 1 );
-
-		if ( "Trigger" == name || "BadRun" == name ){
-			StMuEvent *muEvent = muDst->event();
-			int runId = muEvent->runId();	
-
-			int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
-			int drn = (runId - (runRange->min + day * 1000) ); // run in day
-
-			if ( "Trigger" == name ){
-				histos->pre_runIds->Fill( day, drn );
-			} else if ( "BadRun" == name ){
-				histos->runIds->Fill( day, drn );
-			} 
-		}
 	}
 }
 

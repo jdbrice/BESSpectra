@@ -105,8 +105,8 @@ public:
 		pre_eta_phi 	= new TH2F( "track_pre_eta_phi", "pre #eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 		eta_phi 		= new TH2F( "track_eta_phi", "#eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 
-		beta_p 			= new TH2F( "track_beta_p", "beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
-		pre_beta_p 			= new TH2F( "track_pre_beta_p", "pre beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
+		beta_p 			= new TH2F( "track_beta_p", "beta; P [GeV/c]; 1/#beta", 400, -5, 5, 400, -.1, 3 );
+		pre_beta_p 			= new TH2F( "track_pre_beta_p", "pre beta; P [GeV/c]; 1/#beta", 400, -5, 5, 400, -.1, 3 );
 
 		dEdx_p 			= new TH2F( "track_dEdx_p", "dEdx; P [GeV/c]; dEdx", 400, -5, 5, 400, 1.5, 8 );
 		pre_dEdx_p 			= new TH2F( "track_pre_dEdx_p", "pre dEdx; P [GeV/c]; dEdx", 400, -5, 5, 400, 1.5, 8 );

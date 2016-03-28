@@ -289,40 +289,46 @@ Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 	 */
 	preTrackCuts( primaryTrack );
 
+	double eta = pMom.pseudoRapidity();
+	if ( eta < cut_pseudorapidity->min || eta > cut_pseudorapidity->max )
+		allCuts = false;
+	else 
+		passTrackCut( "eta", allCuts );
+
 	if ( !cut_flag->inInclusiveRange( primaryTrack->flag() ) )
 		allCuts = false;
 	else 
 		passTrackCut( "flag", allCuts );
+
+	if ( primaryTrack->dcaGlobal().magnitude() > cut_dca->max )
+		allCuts = false;
+	else 
+		passTrackCut( "DCA", allCuts );
 
 	if ( primaryTrack->nHitsFit( kTpcId ) < cut_nHitsFit->min  )
 		allCuts = false;
 	else 
 		passTrackCut( "nHitsFit", allCuts );
 
-	if ( (float)primaryTrack->nHitsFit(kTpcId) / (float)primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
-		allCuts = false;
-	else 
-		passTrackCut( "nHitsRatio", allCuts );
-
 	if ( primaryTrack->nHitsDedx() < cut_nHitsDedx->min )
 		allCuts = false;	
 	else 
 		passTrackCut( "nHitsDedx", allCuts );
 
-	if ( ptRatio < cut_ptRatio->min || ptRatio > cut_ptRatio->max )
+	if ( (float)primaryTrack->nHitsFit(kTpcId) / (float)primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
 		allCuts = false;
 	else 
-		passTrackCut( "ptRatio", allCuts );
+		passTrackCut( "nHitsRatio", allCuts );
 
 	if ( pMom.perp() < cut_pt->min )
 		allCuts = false;
 	else 
 		passTrackCut( "pmmtm", allCuts );
 
-	if ( primaryTrack->dcaGlobal().magnitude() > cut_dca->max )
+	if ( ptRatio < cut_ptRatio->min || ptRatio > cut_ptRatio->max )
 		allCuts = false;
 	else 
-		passTrackCut( "DCA", allCuts );
+		passTrackCut( "ptRatio", allCuts );
 
 	double y = rapidity( pMom.perp(), pMom.pseudoRapidity(), massAssumption );
 	if ( y < cut_rapidity->min || y > cut_rapidity->max )
@@ -330,11 +336,7 @@ Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 	else 
 		passTrackCut( "y", allCuts );
 
-	double eta = pMom.pseudoRapidity();
-	if ( eta < cut_pseudorapidity->min || eta > cut_pseudorapidity->max )
-		allCuts = false;
-	else 
-		passTrackCut( "eta", allCuts );
+	
 
 
 	/**
