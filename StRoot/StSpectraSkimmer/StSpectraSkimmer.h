@@ -44,7 +44,7 @@ protected:
 	jdb::ConfigRange *cut_vZ, *cut_vR, *cut_nTofMatch;
 	//track
 	jdb::ConfigRange *cut_nHitsFit, *cut_nHitsDedx, *cut_nHitsRatio, *cut_rapidity, *cut_pseudorapidity;
-	jdb::ConfigRange *cut_pt, *cut_ptRatio, *cut_dca, *cut_yLocal, *cut_zLocal;
+	jdb::ConfigRange *cut_pt, *cut_ptRatio, *cut_dca, *cut_yLocal, *cut_zLocal, *cut_flag;
 	jdb::ConfigPoint *cut_vR_offset;
 
 
@@ -69,6 +69,7 @@ protected:
 
 	// Event variables to make available to children
 	Int_t runId;
+	bool skipRun;
 	Float_t eventWeight;
 	Float_t corrRefMult;
 	Int_t cent9;
@@ -103,6 +104,13 @@ protected:
 	StRefMultCorr* refmultCorrUtil;
 
 	void processMuDst();
+
+	bool isRunBad( int runId ){
+
+		if ( find( badRuns.begin(), badRuns.end(), runId ) != badRuns.end() )
+			return true;
+		return false;
+	}
 
 	
 	StMuDst *muDst;

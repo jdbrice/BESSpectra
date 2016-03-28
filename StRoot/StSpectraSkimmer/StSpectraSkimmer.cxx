@@ -56,6 +56,7 @@ void StSpectraSkimmer::processMuDst() {
 	nPrimary = muDst->numberOfPrimaryTracks();
 	
 	Int_t nPrimaryGood = 0;
+	LOG_INFO << "# of Primary Tracks = " << nPrimary << endl << endm;
 	for (int iNode = 0; iNode < nPrimary; iNode++ ){
 		
 		StMuTrack*	tPrimary 	= (StMuTrack*)muDst->primaryTracks(iNode);
@@ -71,6 +72,25 @@ void StSpectraSkimmer::processMuDst() {
 	}
 
 	postTrackLoop( nPrimaryGood );
+	LOG_INFO << "nPrimaryGood #1" << nPrimaryGood << endl << endm;
+
+	nPrimaryGood = 0;
+	TObjArray* tracks = muDst->primaryTracks() ;      // Create a TObject array containing the primary tracks
+  	TObjArrayIter  GetTracks(tracks) ;                        // Create an iterator to step through the tracks
+  	StMuTrack*                 track ;                        // Pointer to a track
+  
+  
+  
+  	Int_t nAllPrimary = 0;
+  	while((track = (StMuTrack*)GetTracks.Next() ) ) {
+  		nAllPrimary++;
+    }
+
+
+    LOG_INFO << "nPrimary" << nPrimary << "nIterator" << nAllPrimary << endl << endm;
+
+
+
 
 
 	//- debug info`
@@ -82,13 +102,9 @@ void StSpectraSkimmer::processMuDst() {
 		timer.stop();
 		LOG_INFO << "CPU time for StEventMaker::Make(): " << timer.elapsedTime() << " sec\n" << endm;
 	}
-
-
 }
 
 void StSpectraSkimmer::postTrackLoop( Int_t nPrimaryGoodTracks ){
-
-
 }
 
 
@@ -117,7 +133,6 @@ Int_t StSpectraSkimmer::nTofMatchedTracksA(){
 	}
 
 	return nTofMatched;
-
 }
 
 
@@ -134,12 +149,9 @@ void StSpectraSkimmer::preEventCuts(){
  */
 void StSpectraSkimmer::postEventCuts(){
 	//LOG_INFO << "StSpectraSkimmer::postEventCuts" << endm;
-
-
 }
 
 void StSpectraSkimmer::passEventCut( string name ){
-	
 }
 
 /**
@@ -170,8 +182,7 @@ Bool_t StSpectraSkimmer::keepEvent(){
 		return false;
 	passEventCut( "Trigger" );
 
-	if ( refmultCorrUtil->isBadRun( runId ) ){
-		LOG_DEBUG << runId << " is BAD " << endm;
+	if ( isRunBad( runId ) ){
 		return false;
 	}
 	passEventCut( "BadRun" );
@@ -179,7 +190,8 @@ Bool_t StSpectraSkimmer::keepEvent(){
 
 	StThreeVectorD pVtx(-999., -999., -999.);  
 	if( !muDst->primaryVertex() ) {
-		//LOG_INFO << "No Primary Vertex" << endm;
+		// LOG_INFO << "No Primary Vertex" << endl << endm;
+		// LOG_INFO << "MuDst N Primary : " << muDst->numberOfPrimaryVertices() << endl << endm;
 		return false;
 	}
 	passEventCut( "VertexExists" );
@@ -214,6 +226,7 @@ Bool_t StSpectraSkimmer::keepEvent(){
 		return false;
 
 
+
 	if ( pVtx.z() > cut_vZ->max  || pVtx.z() < cut_vZ->min)
 		return false;
 	passEventCut( "vZ");
@@ -233,7 +246,6 @@ Bool_t StSpectraSkimmer::keepEvent(){
 	postEventCuts();
 
 	return true;
-
 }
 
 
@@ -277,11 +289,15 @@ Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 	 */
 	preTrackCuts( primaryTrack );
 
+	if ( !cut_flag->inInclusiveRange( primaryTrack->flag() ) )
+		return false;
+	passTrackCut( "flag" );
+
 	if ( primaryTrack->nHitsFit( kTpcId ) < cut_nHitsFit->min  )
 		return false;
 	passTrackCut( "nHitsFit" );
 
-	if ( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
+	if ( (float)primaryTrack->nHitsFit(kTpcId) / (float)primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
 		return false;
 	passTrackCut( "nHitsRatio" );
 
@@ -322,10 +338,6 @@ Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 }
 
 
-
-
-
-
 ClassImp(StSpectraSkimmer)
 
 /**
@@ -350,6 +362,7 @@ StSpectraSkimmer::StSpectraSkimmer( const Char_t *name="rcpSkimmer", const Char_
 
 	cut_nTofMatch = new jdb::ConfigRange( cfgCuts, "Event.nTofMatch" );
 
+	cut_flag = new jdb::ConfigRange( cfgCuts, "Track.flag" );
 	cut_nHitsFit = new jdb::ConfigRange( cfgCuts, "Track.nHitsFit" );
 	cut_nHitsDedx = new jdb::ConfigRange( cfgCuts, "Track.nHitsDedx" );
 	cut_nHitsRatio = new jdb::ConfigRange( cfgCuts, "Track.nHitsRatio" );
@@ -397,6 +410,7 @@ StSpectraSkimmer::StSpectraSkimmer( const Char_t *name="rcpSkimmer", const Char_
 	LOG_INFO << "nTofMatch : ( " << cut_nTofMatch->min  << ", " << cut_nTofMatch->max << " )" << endm;
 
 	LOG_INFO << "Track Cuts \n\n" << endm;
+	LOG_INFO << "flag : ( " << cut_flag->min  << ", " << cut_flag->max << " )" << endm;
 	LOG_INFO << "nHitsFit : ( " << cut_nHitsFit->min  << ", " << cut_nHitsFit->max << " )" << endm;
 	LOG_INFO << "nHitsDedx : ( " << cut_nHitsDedx->min  << ", " << cut_nHitsDedx->max << " )" << endm;
 	LOG_INFO << "nHitsRatio : ( " << cut_nHitsRatio->min  << ", " << cut_nHitsRatio->max << " )" << endm;
@@ -438,8 +452,15 @@ Int_t StSpectraSkimmer::Init( ){
 }
 
 
-Int_t StSpectraSkimmer::InitRun( int runnumber ) {
-
+Int_t StSpectraSkimmer::InitRun( int runId ) {
+	LOG_INFO << "Run # " << runId << endm;
+	
+	skipRun = false;
+	if ( isRunBad( runId ) ){
+		LOG_INFO << " Run is BAD, skipping " << endm;
+		skipRun = true;
+	}
+	
 	return kStOK;
 }
 
@@ -467,7 +488,11 @@ Int_t StSpectraSkimmer::Finish() {
  */
 Int_t StSpectraSkimmer::Make(){
 
-  processMuDst();
 
-  return kStOK;
+	// efficiently skip bad runs
+	if ( !skipRun ){
+  		processMuDst();
+  	}
+
+  	return kStOK;
 }

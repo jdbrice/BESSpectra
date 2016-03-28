@@ -40,6 +40,7 @@ public:
 		pre_refMult = new TH1F( "event_pre_refMult", "Pre Raw RefMult", 400, 0, 400 );
 		refMult 	= new TH1F( "event_refMult", "Raw RefMult", 400, 0, 400 );
 		corrRefMult = new TH1F( "event_corrRefMult", "Corr RefMult", 1000, 0, 500 );
+		corrRefMult_bin9 = new TH2F( "event_corrRefMult_bin9", "Corr RefMult vs. bin9; bin9 ; corrRefMult", 20, 0, 20, 1000, 0, 500 );
 		refMultBins = new TH1F( "event_refMultBins", "Corr RefMult Bins", 10, 0, 10 );
 		refMultBinsUnweighted = new TH1F( "event_refMultBinsUnweighted", "Corr RefMult Bins (Unweighted)", 10, 0, 10 );
 
@@ -66,11 +67,17 @@ public:
 		pre_nHitsFit 	= new TH1F( "track_pre_nHitsFit", "", 52, 0, 52 );
 		nHitsFit 		= new TH1F( "track_nHitsFit", "", 52, 0, 52 );
 
+		pre_flag 		= new TH1F( "track_pre_flag", "", 250, 0, 1000 );
+		flag 			= new TH1F( "track_flag", "", 250, 0, 1000 );
+
 		pre_nHitsDedx 	= new TH1F( "track_pre_nHitsDedx", "", 52, 0, 52 );
 		nHitsDedx 		= new TH1F( "track_nHitsDedx", "", 52, 0, 52 );
 
-		pre_nHitsFitOverPoss 	= new TH1F( "track_pre_nHitsFitOverPoss", "", 100, 0, 1.0 );
-		nHitsFitOverPoss 		= new TH1F( "track_nHitsFitOverPoss", "", 100, 0, 1.0 );
+		pre_nHitsPoss 	= new TH1F( "track_pre_nHitsPoss", "", 52, 0, 52 );
+		nHitsPoss 		= new TH1F( "track_nHitsPoss", "", 52, 0, 52 );
+
+		pre_nHitsFitOverPoss 	= new TH1F( "track_pre_nHitsFitOverPoss", "", 110, 0, 1.1 );
+		nHitsFitOverPoss 		= new TH1F( "track_nHitsFitOverPoss", "", 110, 0, 1.1 );
 
 		pre_ptRatio 	= new TH1F( "track_pre_ptRatio", "", 100, 0, 2.1  );
 		ptRatio 		= new TH1F( "track_ptRatio", "", 100, 0, 2.1 );
@@ -104,6 +111,9 @@ public:
 		}
 
 
+		meta_track_vertex_index = new TH1F( "track_vertex_index", "Track Vertex Index", 10, 0, 10 );
+
+
 	}
 	~StSpectraQAHistos();
 
@@ -113,7 +123,7 @@ public:
 	TH2I *runIds, *pre_runIds;
 	TH1I *eventCuts;
 	TH1F *pre_vZ, *pre_vR, *pre_nTofMatchA, *nTrack_refMult, *refMult, *pre_refMult;
-	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult;
+	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult, *corrRefMult_bin9;
 	TH1F *vZ, *vR, *nTofMatchA, *corrRefMult, *refMultBins, *refMultBinsUnweighted;
 
 
@@ -121,16 +131,22 @@ public:
 	 * Track Histos
 	 */
 	TH1I *trackCuts;
-	TH1F * pre_nHitsFit, *pre_nHitsDedx, *pre_nHitsFitOverPoss, *pre_ptRatio, *pre_dca;
-	TH1F * nHitsFit, *nHitsDedx, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
+	TH1F *pre_nHitsFit, *pre_nHitsDedx, *pre_nHitsPoss, *pre_nHitsFitOverPoss, *pre_ptRatio, *pre_dca, *pre_flag, *flag;
+	TH1F *nHitsFit, *nHitsDedx, *nHitsPoss, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
 	TH1F *pre_eta, *eta, *pre_rapidity, *rapidity;
-	TH2F * pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
-	TH2F * beta_p, *pre_beta_p;
+	TH2F *pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
+	TH2F *beta_p, *pre_beta_p;
 
 	/**
 	 * Analysis 
 	 */
 	TH1F * ptSpectra[9];
+
+
+	/**
+	 * META
+	 */
+	TH1F * meta_track_vertex_index;
 
 
 };

@@ -59,6 +59,7 @@ void StSpectraQAMaker::postEventCuts(){
 	histos->nTofMatchA->Fill( nTofMatchedTracks );
 	histos->refMult->Fill( muEvent->refMult() );
 	histos->corrRefMult->Fill( corrRefMult, eventWeight );
+	histos->corrRefMult_bin9->Fill( cent9, corrRefMult, eventWeight );
 	histos->refMultBins->Fill( cent9, eventWeight );
 	histos->refMultBinsUnweighted->Fill( cent9 );
 	histos->nTofMatchA_corrRefMult->Fill( nTofMatchedTracks, corrRefMult );
@@ -72,7 +73,10 @@ void StSpectraQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
+
+	histos->pre_flag->Fill( primaryTrack->flag() );
 	histos->pre_nHitsFit->Fill( primaryTrack->nHitsFit(kTpcId), eventWeight );
+	histos->pre_nHitsPoss->Fill( primaryTrack->nHitsPoss(kTpcId), eventWeight );
 	histos->pre_nHitsFitOverPoss->Fill( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId), eventWeight );
 	histos->pre_nHitsDedx->Fill( primaryTrack->nHitsDedx(), eventWeight );
 	histos->pre_ptRatio->Fill( ptRatio, eventWeight );
@@ -87,6 +91,8 @@ void StSpectraQAMaker::preTrackCuts( StMuTrack *primaryTrack ){
 
 
 	histos->pre_beta_p->Fill( pMom.mag() * primaryTrack->charge(), 1.0 / tofPid.beta(), eventWeight );
+
+	histos->meta_track_vertex_index->Fill( primaryTrack->vertexIndex() );
 }
 
 void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
@@ -97,9 +103,15 @@ void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	StThreeVectorF pMom = primaryTrack->momentum();
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
+	float fitRatio = (float)primaryTrack->nHitsFit(kTpcId) / (float)primaryTrack->nHitsPoss(kTpcId);
 
+
+	histos->flag->Fill( primaryTrack->flag() );
 	histos->nHitsFit->Fill( primaryTrack->nHitsFit(kTpcId), eventWeight );
-	histos->nHitsFitOverPoss->Fill( (float)primaryTrack->nHitsFit(kTpcId) / primaryTrack->nHitsPoss(kTpcId), eventWeight );
+	histos->nHitsPoss->Fill( primaryTrack->nHitsPoss(kTpcId), eventWeight );
+
+	histos->nHitsFitOverPoss->Fill( fitRatio, eventWeight );
+
 	histos->nHitsDedx->Fill( primaryTrack->nHitsDedx(), eventWeight );
 	histos->ptRatio->Fill( ptRatio, eventWeight );
 	histos->ptRatio2D->Fill( pMom.perp(), gMom.perp(), eventWeight );
@@ -115,7 +127,8 @@ void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 
 	histos->beta_p->Fill( pMom.mag() * primaryTrack->charge(), 1.0 / tofPid.beta(), eventWeight );
 
-	histos->ptSpectra[ cent9 ]->Fill( pMom.perp() * primaryTrack->charge(), eventWeight );	
+	if ( cent9 >= 0 && cent9 <= 8 )
+		histos->ptSpectra[ cent9 ]->Fill( pMom.perp() * primaryTrack->charge(), eventWeight );	
 }
 
 //---------------------------------------------------------------------------

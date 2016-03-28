@@ -17,7 +17,6 @@ void StSpectraPicoMaker::postEventCuts(){
 	mData.weight 		= eventWeight;
 	mData.bin9 			= cent9;
 	mData.bin16 		= cent16;
-	mData.nTofMatchedTracks = nTofMatchedTracks;
 }
 
 void StSpectraPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
@@ -40,13 +39,13 @@ void StSpectraPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 	mData.nHitsDedx[ iGoodTrack ] 	= tPrimary->nHitsDedx();
 	mData.nHitsPossible[ iGoodTrack ] = tGlobal->nHitsPoss(kTpcId);
 
-	mData.dca[ iGoodTrack ]			= (Float_t)tPrimary->dcaGlobal().magnitude();
+	mData.dca[ iGoodTrack ]			= (Float_t)(tPrimary->dcaGlobal().magnitude() );
 
 	// get the tof pid
 	StMuBTofPidTraits tofPid = tGlobal->btofPidTraits();
 
 
-	mData.matchFlag[ iGoodTrack ]			= tofPid.matchFlag();
+	mData.matchFlag[ iGoodTrack ]	= tofPid.matchFlag();
 	// defaults
 	mData.beta[ iGoodTrack ] 		= 0;
 	mData.yLocal[ iGoodTrack ]		= 0;
@@ -89,7 +88,6 @@ void StSpectraPicoMaker::bookNtuples(){
 	mTree->Branch("runId",				&mData.runId,"run/I");
 	mTree->Branch("bin16",				&mData.bin16,"bin16/s");
 	mTree->Branch("bin9",				&mData.bin9,"bin9/s");
-	mTree->Branch("nTofMatchedTracks",	&mData.nTofMatchedTracks,"nTofMatchedTracks/s");
 	mTree->Branch("weight",				&mData.weight,"weight/F");
 	mTree->Branch("corrRefMult",		&mData.corrRefMult,"corrRefMult/F");
 	mTree->Branch("nTracks",			&mData.nTracks,"nTracks/I");
