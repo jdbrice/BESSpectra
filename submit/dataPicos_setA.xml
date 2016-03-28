@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<job maxFilesPerProcess="3" filesPerHour="12" fileListSyntax="xrootd">
+<job maxFilesPerProcess="1" filesPerHour="10" fileListSyntax="xrootd">
 	
 	<command>
 		starver SL14i
-		root4star -b -q -l 'scripts/baseQA.C("'$FILELIST'", "'$JOBID.root'", 5000000, 5)' &gt;&amp; log_${JOBID}.log
+		root4star -b -q -l 'scripts/dataPicos.C("'$FILELIST'", "'$JOBID.SpectraPicoDst.root'", 50000000, 5)' &gt;&amp; log_${JOBID}.log
 
 	</command>
 
@@ -11,14 +11,13 @@
 	<stderr URL="file:/star/data03/pwg/jdb/scratch/log/$JOBID.err" />
 	
 
-	<input URL="catalog:star.bnl.gov?collision=auau15,production=P14ii,filetype=daq_reco_mudst,filename~st_physics,runnumber[]15053000-15071000" nFiles="2000000" />
-	<!-- <input URL="filelist:/star/u/jdb/work/BESSpectra/list/badRun.lis" /> -->
+	<input URL="filelist:/star/u/jdb/work/BESSpectra/list/march_23_small.lis" nFiles="20000" />
 
 	<output fromScratch="*" toURL="file:/star/data03/pwg/jdb/scratch/"/>
 
 	<SandBox>
  		<Package>
- 			<File>file:./scripts/baseQA.C</File>
+ 			<File>file:./scripts/dataPicos.C</File>
  			<File>file:./.sl64_gcc482/</File> 
  			<File>file:./StRoot/StRefMultCorr/Centrality_def_refmult.txt</File>
  			<File>file:./cuts.xml</File>

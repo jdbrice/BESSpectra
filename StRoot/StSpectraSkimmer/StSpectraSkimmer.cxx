@@ -56,7 +56,7 @@ void StSpectraSkimmer::processMuDst() {
 	nPrimary = muDst->numberOfPrimaryTracks();
 	
 	Int_t nPrimaryGood = 0;
-	LOG_INFO << "# of Primary Tracks = " << nPrimary << endl << endm;
+	
 	for (int iNode = 0; iNode < nPrimary; iNode++ ){
 		
 		StMuTrack*	tPrimary 	= (StMuTrack*)muDst->primaryTracks(iNode);
@@ -72,27 +72,7 @@ void StSpectraSkimmer::processMuDst() {
 	}
 
 	postTrackLoop( nPrimaryGood );
-	LOG_INFO << "nPrimaryGood #1" << nPrimaryGood << endl << endm;
-
-	nPrimaryGood = 0;
-	TObjArray* tracks = muDst->primaryTracks() ;      // Create a TObject array containing the primary tracks
-  	TObjArrayIter  GetTracks(tracks) ;                        // Create an iterator to step through the tracks
-  	StMuTrack*                 track ;                        // Pointer to a track
-  
-  
-  
-  	Int_t nAllPrimary = 0;
-  	while((track = (StMuTrack*)GetTracks.Next() ) ) {
-  		nAllPrimary++;
-    }
-
-
-    LOG_INFO << "nPrimary" << nPrimary << "nIterator" << nAllPrimary << endl << endm;
-
-
-
-
-
+	
 	//- debug info`
 	if (doPrintMemoryInfo) {
 		StMemoryInfo::instance()->snapshot();
@@ -141,7 +121,6 @@ Int_t StSpectraSkimmer::nTofMatchedTracksA(){
  */
 void StSpectraSkimmer::preEventCuts(){
 	//LOG_INFO << "StSpectraSkimmer::preEventCuts" << endm;
-
 }
 
 /**
@@ -151,7 +130,10 @@ void StSpectraSkimmer::postEventCuts(){
 	//LOG_INFO << "StSpectraSkimmer::postEventCuts" << endm;
 }
 
-void StSpectraSkimmer::passEventCut( string name ){
+void StSpectraSkimmer::passEventCut( string name, bool allCuts ){
+}
+
+void StSpectraSkimmer::passSingleEventCut( string name ){
 }
 
 /**
@@ -161,13 +143,16 @@ void StSpectraSkimmer::passEventCut( string name ){
 Bool_t StSpectraSkimmer::keepEvent(){
 	//LOG_INFO << "StSpectraSkimmer::keepEvent" << endm;
 
-	passEventCut( "All");
+	bool allCuts = true;
+
+	passEventCut( "All" );
 	
 	StMuEvent *muEvent = muDst->event();
-	if ( !muEvent )
+	if ( !muEvent ){
 		return false;
-
-	passEventCut( "MuDstEvent" );
+	} else {
+		passEventCut( "MuDstEvent", allCuts );
+	}
 
 	//-- read in TOF info
 	StBTofHeader* tofHeader = muDst->btofHeader();
@@ -179,26 +164,29 @@ Bool_t StSpectraSkimmer::keepEvent(){
 	}
 
 	if ( !isTrigger )
-		return false;
-	passEventCut( "Trigger" );
+		allCuts = false;
+	else {
+		passEventCut( "Trigger", allCuts );	
+	}
+	
 
 	if ( isRunBad( runId ) ){
-		return false;
+		allCuts = false;
+	} else {
+		passEventCut( "BadRun", allCuts );
 	}
-	passEventCut( "BadRun" );
 
 
 	StThreeVectorD pVtx(-999., -999., -999.);  
 	if( !muDst->primaryVertex() ) {
-		// LOG_INFO << "No Primary Vertex" << endl << endm;
-		// LOG_INFO << "MuDst N Primary : " << muDst->numberOfPrimaryVertices() << endl << endm;
-		return false;
+		allCuts = false;
+	} else {
+		pVtx = muDst->primaryVertex()->position();
+		passEventCut( "VertexExists", allCuts );
 	}
-	passEventCut( "VertexExists" );
 
 	nTofMatchedTracks = nTofMatchedTracksA();
-	pVtx = muDst->primaryVertex()->position();
-
+	
 	// Initialize the refMult Corr
 	refmultCorrUtil->init( muEvent->runId() );
 	refmultCorrUtil->initEvent( muEvent->refMult(), pVtx.z() );
@@ -222,35 +210,45 @@ Bool_t StSpectraSkimmer::keepEvent(){
 
 
 	// dont need to keep the events in 80-100% centrality range
-	if ( cent9 < 0 )
-		return false;
+	if ( cent9 < 0 ){
+		allCuts = false;
+	} else {
+		passEventCut( "bin9", allCuts );
+	}
 
 
-
-	if ( pVtx.z() > cut_vZ->max  || pVtx.z() < cut_vZ->min)
-		return false;
-	passEventCut( "vZ");
-
+	if ( pVtx.z() > cut_vZ->max  || pVtx.z() < cut_vZ->min){
+		allCuts = false;
+	} else {
+		passEventCut( "vZ", allCuts );
+	}
 	
 
-	if ( TMath::Sqrt( pX*pX + pY*pY ) > cut_vR->max )
-		return false;
-	passEventCut( "vR");
+	if ( TMath::Sqrt( pX*pX + pY*pY ) > cut_vR->max ){
+		allCuts = false;
+	} else {
+		passEventCut( "vR", allCuts );
+	}
 
-		
-	if ( nTofMatchedTracks < cut_nTofMatch->min )
-		return false;
-	passEventCut( "nTofMatch");
+	if ( nTofMatchedTracks < cut_nTofMatch->min ){
+		allCuts = false;
+	} else{
+		passEventCut( "nTofMatch" );
+	}
 
 	// The Post event cuts hook
-	postEventCuts();
+	if ( allCuts )
+		postEventCuts();
 
-	return true;
+	return allCuts;
 }
 
 
 
-void StSpectraSkimmer::passTrackCut( string name ){
+void StSpectraSkimmer::passTrackCut( string name, bool allCuts ){
+
+}
+void StSpectraSkimmer::passSingleTrackCut( string name ){
 
 }
 
@@ -269,20 +267,22 @@ void StSpectraSkimmer::postTrackCuts(StMuTrack *primaryTrack ){
 Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 	//LOG_INFO << "StSpectraSkimmer::keepTrack( " << iNode << " )" << endm;
 
+	bool allCuts = true;
+
 	StMuTrack*	primaryTrack 	= (StMuTrack*)muDst->primaryTracks(iNode);
 	passTrackCut("All");
 
 	const StMuTrack *globalTrack = primaryTrack->globalTrack();
-	if (!globalTrack ) 
+	if (!globalTrack ){
 		return false;
-
-	passTrackCut( "primaryWGlobal");
+	} else {
+		passTrackCut( "primaryWGlobal", allCuts);	
+	}
 
 	StThreeVectorF pMom = primaryTrack->momentum();
 	StThreeVectorF gMom = globalTrack->momentum();
 	float ptRatio = gMom.perp() / pMom.perp();
 
-	
 
 	/**
 	 * Pre Cut Hook
@@ -290,50 +290,60 @@ Bool_t StSpectraSkimmer::keepTrack( Int_t iNode ){
 	preTrackCuts( primaryTrack );
 
 	if ( !cut_flag->inInclusiveRange( primaryTrack->flag() ) )
-		return false;
-	passTrackCut( "flag" );
+		allCuts = false;
+	else 
+		passTrackCut( "flag", allCuts );
 
 	if ( primaryTrack->nHitsFit( kTpcId ) < cut_nHitsFit->min  )
-		return false;
-	passTrackCut( "nHitsFit" );
+		allCuts = false;
+	else 
+		passTrackCut( "nHitsFit", allCuts );
 
 	if ( (float)primaryTrack->nHitsFit(kTpcId) / (float)primaryTrack->nHitsPoss(kTpcId) < cut_nHitsRatio->min )
-		return false;
-	passTrackCut( "nHitsRatio" );
+		allCuts = false;
+	else 
+		passTrackCut( "nHitsRatio", allCuts );
 
 	if ( primaryTrack->nHitsDedx() < cut_nHitsDedx->min )
-		return false;	
-	passTrackCut( "nHitsDedx" );
+		allCuts = false;	
+	else 
+		passTrackCut( "nHitsDedx", allCuts );
 
 	if ( ptRatio < cut_ptRatio->min || ptRatio > cut_ptRatio->max )
-		return false;
-	passTrackCut( "ptRatio" );
+		allCuts = false;
+	else 
+		passTrackCut( "ptRatio", allCuts );
 
 	if ( pMom.perp() < cut_pt->min )
-		return false;
-	passTrackCut( "pmmtm" );
+		allCuts = false;
+	else 
+		passTrackCut( "pmmtm", allCuts );
 
 	if ( primaryTrack->dcaGlobal().magnitude() > cut_dca->max )
-		return false;
-	passTrackCut( "DCA" );
+		allCuts = false;
+	else 
+		passTrackCut( "DCA", allCuts );
 
 	double y = rapidity( pMom.perp(), pMom.pseudoRapidity(), massAssumption );
 	if ( y < cut_rapidity->min || y > cut_rapidity->max )
-		return false;
-	passTrackCut( "y" );
+		allCuts = false;
+	else 
+		passTrackCut( "y", allCuts );
 
 	double eta = pMom.pseudoRapidity();
 	if ( eta < cut_pseudorapidity->min || eta > cut_pseudorapidity->max )
-		return false;
-	passTrackCut( "eta" );
+		allCuts = false;
+	else 
+		passTrackCut( "eta", allCuts );
 
 
 	/**
 	 * Post Cut Hook
 	 */
-	postTrackCuts( primaryTrack );
+	if ( allCuts )
+		postTrackCuts( primaryTrack );
 
-	return true;
+	return allCuts;
 
 }
 
@@ -490,9 +500,10 @@ Int_t StSpectraSkimmer::Make(){
 
 
 	// efficiently skip bad runs
-	if ( !skipRun ){
-  		processMuDst();
-  	}
+	// if ( !skipRun ){
+
+  	processMuDst();
+  	
 
   	return kStOK;
 }

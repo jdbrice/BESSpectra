@@ -32,6 +32,7 @@ public:
 			Event Cuts
 		 */
 		eventCuts 	= new TH1I( "event_cuts", "Event Cuts", 10, 0, 10 );
+		eventSingleCuts = new TH1I( "event_single_cuts", "Event Single Cuts", 10, 0, 10 );
 		pre_runIds 	= new TH2I( "pre_run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
 		runIds 		= new TH2I( "run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
 		
@@ -64,6 +65,7 @@ public:
 		 * Track Histos
 		 */
 		trackCuts 		= new TH1I( "track_cuts", "Track Cuts", 20, 0, 20 );
+		trackSingleCuts = new TH1I( "track_single_cuts", "Track Single Cuts", 20, 0, 20 );
 		pre_nHitsFit 	= new TH1F( "track_pre_nHitsFit", "", 52, 0, 52 );
 		nHitsFit 		= new TH1F( "track_nHitsFit", "", 52, 0, 52 );
 
@@ -106,6 +108,9 @@ public:
 		beta_p 			= new TH2F( "track_beta_p", "beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
 		pre_beta_p 			= new TH2F( "track_pre_beta_p", "pre beta; P [GeV/c]; 1/#beta", 160, -5, 5, 200, -.5, 3 );
 
+		dEdx_p 			= new TH2F( "track_dEdx_p", "dEdx; P [GeV/c]; dEdx", 400, -5, 5, 400, 1.5, 8 );
+		pre_dEdx_p 			= new TH2F( "track_pre_dEdx_p", "pre dEdx; P [GeV/c]; dEdx", 400, -5, 5, 400, 1.5, 8 );
+
 		for ( int i = 0; i < 9; i++ ){
 			ptSpectra[ i ] = new TH1F( ("pt_spectra_" + jdb::ts(i)).c_str(), "p_T Spectra", 200, -5, 5  );
 		}
@@ -121,7 +126,7 @@ public:
 	 * Event Histos
 	 */
 	TH2I *runIds, *pre_runIds;
-	TH1I *eventCuts;
+	TH1I *eventCuts, *eventSingleCuts;
 	TH1F *pre_vZ, *pre_vR, *pre_nTofMatchA, *nTrack_refMult, *refMult, *pre_refMult;
 	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult, *corrRefMult_bin9;
 	TH1F *vZ, *vR, *nTofMatchA, *corrRefMult, *refMultBins, *refMultBinsUnweighted;
@@ -130,12 +135,12 @@ public:
 	/**
 	 * Track Histos
 	 */
-	TH1I *trackCuts;
+	TH1I *trackCuts, *trackSingleCuts;
 	TH1F *pre_nHitsFit, *pre_nHitsDedx, *pre_nHitsPoss, *pre_nHitsFitOverPoss, *pre_ptRatio, *pre_dca, *pre_flag, *flag;
 	TH1F *nHitsFit, *nHitsDedx, *nHitsPoss, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
 	TH1F *pre_eta, *eta, *pre_rapidity, *rapidity;
 	TH2F *pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
-	TH2F *beta_p, *pre_beta_p;
+	TH2F *beta_p, *pre_beta_p, *dEdx_p, *pre_dEdx_p;
 
 	/**
 	 * Analysis 

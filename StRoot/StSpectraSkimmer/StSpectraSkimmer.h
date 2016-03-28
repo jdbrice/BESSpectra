@@ -63,7 +63,8 @@ protected:
 	 * Event Selection
 	 */
 	Bool_t keepEvent();
-	virtual void passEventCut( string name );
+	virtual void passEventCut( string name, bool allCuts = false );
+	virtual void passSingleEventCut( string name );
 	virtual void preEventCuts();
 	virtual void postEventCuts();
 
@@ -95,7 +96,8 @@ protected:
 	 * Track Selection
 	 */
 	Bool_t keepTrack( Int_t iNode );
-	virtual void passTrackCut( string name );
+	virtual void passTrackCut( string name, bool allCuts = false );
+	virtual void passSingleTrackCut( string name );
 	virtual void preTrackCuts( StMuTrack *primaryTrack );
 	virtual void postTrackCuts( StMuTrack *primaryTrack );
 
