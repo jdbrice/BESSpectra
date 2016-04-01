@@ -135,6 +135,8 @@ void StSpectraSkimmer::passEventCut( string name, bool allCuts ){
 
 void StSpectraSkimmer::passSingleEventCut( string name ){
 }
+void StSpectraSkimmer::failSingleEventCut( string name ){
+}
 
 /**
  * Apply Event cuts
@@ -162,16 +164,18 @@ Bool_t StSpectraSkimmer::keepEvent(){
 	for ( int t : triggers ){
 		isTrigger = isTrigger || muEvent->triggerIdCollection().nominal().isTrigger( t );
 	}
+	if ( triggers.size( ) <= 0 )
+		isTrigger = true;
 
 	if ( !isTrigger )
 		allCuts = false;
 	else {
 		passEventCut( "Trigger", allCuts );	
 	}
-	
 
 	if ( isRunBad( runId ) ){
 		allCuts = false;
+		failSingleEventCut( "BadRun" );
 	} else {
 		passEventCut( "BadRun", allCuts );
 	}
@@ -436,6 +440,11 @@ StSpectraSkimmer::StSpectraSkimmer( const Char_t *name="rcpSkimmer", const Char_
 	
 	
 	LOG_INFO << "\n\n\n" << endm;
+
+
+	if ( triggers.size( ) <= 0 )
+		LOG_WARN << "No Trigger Selected : Taking all Triggers " << endl << endm;
+
 
 }
 

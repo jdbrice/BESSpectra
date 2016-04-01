@@ -22,6 +22,7 @@ private:
 
 	virtual void passEventCut( string name, bool allCuts = false );
 	virtual void passSingleEventCut( string name );
+	virtual void failSingleEventCut( string name );
 	virtual void preEventCuts();
 	virtual void postEventCuts();
 

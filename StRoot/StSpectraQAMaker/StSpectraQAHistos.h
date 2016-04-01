@@ -26,15 +26,22 @@ public:
 		if ( lastRun < 0 )
 			lastDay = firstDay + 24;
 
+		string dayMod = "";
+		if ( 0 != firstDay )
+			dayMod = " - " + jdb::ts( firstDay );
 		int nDays = lastDay - firstDay + 1;
-		string rTitle = "Run Ids Pre-Rejection; Day - " + jdb::ts( firstDay ) + "; Run# for Day";
+		
 		/*
 			Event Cuts
 		 */
-		eventCuts 	= new TH1I( "event_cuts", "Event Cuts", 10, 0, 10 );
+		eventCuts 		= new TH1I( "event_cuts", "Event Cuts", 10, 0, 10 );
 		eventSingleCuts = new TH1I( "event_single_cuts", "Event Single Cuts", 10, 0, 10 );
-		pre_runIds 	= new TH2I( "pre_run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
-		runIds 		= new TH2I( "run_ids", rTitle.c_str(), nDays, 0, nDays, 150, 0, 150 );
+		
+		string rTitle = "Bad Runs; Day" + dayMod + "; Run# for Day";
+		badRunIds 		= new TH2I( "bad_run_ids", rTitle.c_str(), nDays, -0.5, nDays-0.5, 150, -0.5, 150-0.5 );
+		
+		rTitle = "Good Runs; Day" + dayMod + "; Run# for Day";
+		goodRunIds 		= new TH2I( "good_run_ids", rTitle.c_str(), nDays, -0.5, nDays-0.5, 150, -0.5, 150-0.5 );
 		
 		nTrack_refMult = new TH1F( "event_nTrack_refMult", "nTrack vs. RefMult", 400, 0, 400 );
 		
@@ -42,6 +49,7 @@ public:
 		refMult 	= new TH1F( "event_refMult", "Raw RefMult", 400, 0, 400 );
 		corrRefMult = new TH1F( "event_corrRefMult", "Corr RefMult", 1000, 0, 500 );
 		corrRefMult_bin9 = new TH2F( "event_corrRefMult_bin9", "Corr RefMult vs. bin9; bin9 ; corrRefMult", 20, 0, 20, 1000, 0, 500 );
+		corrRefMult_bin16 = new TH2F( "event_corrRefMult_bin16", "Corr RefMult vs. bin16; bin16; corrRefMult", 20, 0, 20, 1000, 0, 500 );
 		refMultBins = new TH1F( "event_refMultBins", "Corr RefMult Bins", 10, 0, 10 );
 		refMultBinsUnweighted = new TH1F( "event_refMultBinsUnweighted", "Corr RefMult Bins (Unweighted)", 10, 0, 10 );
 
@@ -87,8 +95,8 @@ public:
 		pre_ptRatio2D 	= new TH2F( "track_pre_ptRatio2D", "Global vs. Primary; Primary pT; Global pT", 50, 0, 5, 50, 0, 5  );
 		ptRatio2D 		= new TH2F( "track_ptRatio2D", "Global vs. Primary; Primary pT; Global pT", 50, 0, 5, 50, 0, 5 );
 
-		pre_dca 	= new TH1F( "track_pre_dca", "", 160, 0, 4.0  );
-		dca 		= new TH1F( "track_dca", "", 140, 0, 3.5 );
+		pre_dca 	= new TH1F( "track_pre_dca", "Pre Track Cuts;globalDCA [cm]; dN/dglobalDCA", 1000, 0, 100.0  );
+		dca 		= new TH1F( "track_dca", "Post Track Cuts;globalDCA [cm]; dN/dglobalDCA", 140, 0, 3.5 );
 
 		pre_yLocal 	= new TH1F( "track_pre_yLocal", "", 80, -2.5, 2.5  );
 		yLocal 		= new TH1F( "track_yLocal", "", 80, -2.5, 2.5 );
@@ -125,10 +133,10 @@ public:
 	/**
 	 * Event Histos
 	 */
-	TH2I *runIds, *pre_runIds;
+	TH2I *badRunIds, *goodRunIds;
 	TH1I *eventCuts, *eventSingleCuts;
 	TH1F *pre_vZ, *pre_vR, *pre_nTofMatchA, *nTrack_refMult, *refMult, *pre_refMult;
-	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult, *corrRefMult_bin9;
+	TH2F *pre_vX_vY, *vX_vY, *pre_nTofMatchA_corrRefMult, *nTofMatchA_corrRefMult, *corrRefMult_bin9, *corrRefMult_bin16;
 	TH1F *vZ, *vR, *nTofMatchA, *corrRefMult, *refMultBins, *refMultBinsUnweighted;
 
 

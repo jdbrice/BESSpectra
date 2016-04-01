@@ -8,8 +8,8 @@ StChain  *chain=0;
 
 void baseQA( const Char_t *fileList = "small.lis",
 					const Char_t *name = ".root",
-					int maxEvents = 50000,
-					int maxFiles = 10 )
+					int maxEvents = 5000,
+					int maxFiles = 1 )
 {
   	
 

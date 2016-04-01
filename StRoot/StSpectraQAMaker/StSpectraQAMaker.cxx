@@ -18,6 +18,29 @@ void StSpectraQAMaker::postTrackLoop( Int_t nPrimaryGood ){
 
 void StSpectraQAMaker::passSingleEventCut( string name ){
 	histos->eventSingleCuts->Fill( name.c_str(), 1 );
+
+
+	if ( "BadRun" == name ){
+		StMuEvent *muEvent = muDst->event();
+		int runId = muEvent->runId();	
+
+		int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
+		int drn = (runId - (runRange->min + day * 1000) ); // run in day
+
+		histos->goodRunIds->Fill( day, drn );
+	}
+}
+
+void StSpectraQAMaker::failSingleEventCut( string name ){
+	if ( "BadRun" == name ){
+		StMuEvent *muEvent = muDst->event();
+		int runId = muEvent->runId();	
+
+		int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
+		int drn = (runId - (runRange->min + day * 1000) ); // run in day
+
+		histos->badRunIds->Fill( day, drn );
+	} 
 }
 
 void StSpectraQAMaker::passEventCut( string name, bool allCuts  ){
@@ -25,21 +48,21 @@ void StSpectraQAMaker::passEventCut( string name, bool allCuts  ){
 	// Fill the histos for passing this individual cut 
 	passSingleEventCut( name );
 	
-	if ( "Trigger" == name || "BadRun" == name ){
-		StMuEvent *muEvent = muDst->event();
-		int runId = muEvent->runId();	
+	// if ( "Trigger" == name || "BadRun" == name ){
+	// 	StMuEvent *muEvent = muDst->event();
+	// 	int runId = muEvent->runId();	
 
-		int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
-		int drn = (runId - (runRange->min + day * 1000) ); // run in day
+	// 	int day = (runId - runRange->min) / 1000; // day of run from first ( indexed at 0)
+	// 	int drn = (runId - (runRange->min + day * 1000) ); // run in day
 
-		if ( "Trigger" == name ){
-			histos->pre_runIds->Fill( day, drn );
-		} else if ( "BadRun" == name ){
-			histos->runIds->Fill( day, drn );
-		} 
-	}
+	// 	if ( "Trigger" == name ){
+	// 		histos->pre_runIds->Fill( day, drn );
+	// 	} else if ( "BadRun" == name ){
+	// 		histos->runIds->Fill( day, drn );
+	// 	} 
+	// }
 
-	
+
 	// Passed this cut and all previous cuts
 	if ( allCuts ){
 		histos->eventCuts->Fill( name.c_str(), 1 );
@@ -87,6 +110,7 @@ void StSpectraQAMaker::postEventCuts(){
 	histos->refMult->Fill( muEvent->refMult() );
 	histos->corrRefMult->Fill( corrRefMult, eventWeight );
 	histos->corrRefMult_bin9->Fill( cent9, corrRefMult, eventWeight );
+	histos->corrRefMult_bin16->Fill( cent16, corrRefMult, eventWeight );
 	histos->refMultBins->Fill( cent9, eventWeight );
 	histos->refMultBinsUnweighted->Fill( cent9 );
 	histos->nTofMatchA_corrRefMult->Fill( nTofMatchedTracks, corrRefMult );
