@@ -1,8 +1,8 @@
 *.root
-StRooBarb
+
 *.sl64*
 temp_gccflags.c
-StRoot/StRooBarb
+
 ._*
 CVS
 .consign
