@@ -10,3 +10,7 @@ CVS
 *.session.xml
 *.tmp
 list
+*.pdf
+UnitTest.C
+config.xml
+sandbox
