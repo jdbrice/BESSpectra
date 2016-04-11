@@ -113,6 +113,7 @@ public:
 		pre_eta_phi 	= new TH2F( "track_pre_eta_phi", "pre #eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 		eta_phi 		= new TH2F( "track_eta_phi", "#eta", 200, -1.5, 1.5, 60, -3.2, 3.2 );
 
+		matched_beta_p 	= new TH2F( "track_martched_beta_p", "beta for matched tracks; P [GeV/c]; 1/#beta", 400, -5, 5, 400, -.1, 3 );
 		beta_p 			= new TH2F( "track_beta_p", "beta; P [GeV/c]; 1/#beta", 400, -5, 5, 400, -.1, 3 );
 		pre_beta_p 			= new TH2F( "track_pre_beta_p", "pre beta; P [GeV/c]; 1/#beta", 400, -5, 5, 400, -.1, 3 );
 
@@ -148,7 +149,7 @@ public:
 	TH1F *nHitsFit, *nHitsDedx, *nHitsPoss, *nHitsFitOverPoss, *ptRatio, *dca, *pre_yLocal, *pre_zLocal, *yLocal, *zLocal;
 	TH1F *pre_eta, *eta, *pre_rapidity, *rapidity;
 	TH2F *pre_ptRatio2D, *ptRatio2D, *eta_phi, *pre_eta_phi;
-	TH2F *beta_p, *pre_beta_p, *dEdx_p, *pre_dEdx_p;
+	TH2F *beta_p, *pre_beta_p, *dEdx_p, *pre_dEdx_p, *matched_beta_p;
 
 	/**
 	 * Analysis 

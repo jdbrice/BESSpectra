@@ -178,6 +178,18 @@ void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	histos->eta_phi->Fill( pMom.pseudoRapidity(), pMom.phi(), eventWeight );
 
 	histos->beta_p->Fill( pMom.mag() * primaryTrack->charge(), 1.0 / tofPid.beta(), eventWeight );
+	if ( tofPid.matchFlag() >= 1 ){
+		double mbeta = tofPid.beta();
+		if ( mbeta == -999 )
+			mbeta = 0;
+		histos->matched_beta_p->Fill( pMom.mag() * primaryTrack->charge(), mbeta );
+	}
+
+	if ( tofPid.beta( ) <= 0.01  ){
+		LOG_INFO << "beta = " << tofPid.beta() << endl << endm; 
+		LOG_INFO << "tof = " << tofPid.timeOfFlight() << endl << endm; 
+	}
+
 	histos->dEdx_p->Fill( pMom.mag() * primaryTrack->charge(), (globalTrack->dEdx()*1e6), eventWeight );
 
 	if ( cent9 >= 0 && cent9 <= 8 )

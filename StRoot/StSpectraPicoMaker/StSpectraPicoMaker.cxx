@@ -53,7 +53,7 @@ void StSpectraPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 
 	if ( tofPid.matchFlag() >= 1 ){
 		// PID variables
-		if ( tofpid.beta() > 0.01 )
+		if ( tofpid.beta() > -800 )
 			mData.beta[ iGoodTrack ] 		= (UShort_t)(tofpid.beta() * 20000);
 		else
 			mData.beta[ iGoodTrack ] 		= (UShort_t)0;
