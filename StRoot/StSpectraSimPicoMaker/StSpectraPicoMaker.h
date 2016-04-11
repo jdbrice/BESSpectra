@@ -15,7 +15,9 @@ class StSpectraSimPicoMaker : public StMaker {
 
 	virtual Int_t  Init();
 
-
+	Int_t  Make();
+	Int_t  FinishRun(int runnumber);
+	Int_t  Finish();
 	
 
 protected:
