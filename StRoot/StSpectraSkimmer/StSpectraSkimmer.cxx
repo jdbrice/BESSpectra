@@ -173,12 +173,13 @@ Bool_t StSpectraSkimmer::keepEvent(){
 		passEventCut( "Trigger", allCuts );	
 	}
 
-	if ( isRunBad( runId ) ){
-		allCuts = false;
-		failSingleEventCut( "BadRun" );
-	} else {
-		passEventCut( "BadRun", allCuts );
-	}
+	// runId = muEvent->runId();
+	// if ( isRunBad( runId ) ){
+	// 	allCuts = false;
+	// 	failSingleEventCut( "BadRun" );
+	// } else {
+	// 	passEventCut( "BadRun", allCuts );
+	// }
 
 
 	StThreeVectorD pVtx(-999., -999., -999.);  
@@ -201,16 +202,13 @@ Bool_t StSpectraSkimmer::keepEvent(){
 	eventWeight  	= refmultCorrUtil->getWeight();
 
 
-	runId = muEvent->runId();
-
-
-	// The Pre event cuts hook
-	preEventCuts();
-
 
 	pX = pVtx.x() + cut_vR_offset->x;
 	pY = pVtx.y() + cut_vR_offset->y;
 	pZ = pVtx.z();
+
+	// The Pre event cuts hook
+	preEventCuts();
 
 
 	// dont need to keep the events in 80-100% centrality range
@@ -511,9 +509,9 @@ Int_t StSpectraSkimmer::Make(){
 
 
 	// efficiently skip bad runs
-	// if ( !skipRun ){
-
-  	processMuDst();
+	if ( !skipRun ){
+  		processMuDst();
+  	}
   	
 
   	return kStOK;

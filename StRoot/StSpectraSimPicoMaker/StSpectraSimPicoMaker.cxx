@@ -23,7 +23,7 @@ void StSpectraSimPicoMaker::analyzeTrack( Int_t iGoodTrack ){
 	
 	
 	mData.pPt[ iGoodTrack ] 			= getVar( "pPt" );
-	mData.gPt[ iGoodTrack ] 			= getVar( "gPt" );
+	mData.gPt[ iGoodTrack ] 			= mData.pPt[ iGoodTrack ] + getVar( "gPt" );
 	mData.pEta[ iGoodTrack ] 			= getVar( "eta" );
 
 	mData.pP[ iGoodTrack ] 				= mData.pPt[ iGoodTrack ] * cosh( mData.pEta[ iGoodTrack ] );
@@ -36,6 +36,12 @@ void StSpectraSimPicoMaker::analyzeTrack( Int_t iGoodTrack ){
 
 
 	double pidMass = getVar( "pidMass" );
+	map<int, double> masses;
+	masses[0] = 0.1395702;
+	masses[1] = 0.493667;
+	masses[2] = 0.9382721;
+
+	pidMass = masses[ (int)pidMass ];
 
 	mData.matchFlag[ iGoodTrack ]	= getVar( "matchFlag" );
 	// // defaults
