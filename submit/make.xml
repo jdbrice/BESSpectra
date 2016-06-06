@@ -21,7 +21,7 @@
  		<Package>
  			<File>file:./scripts/make.C</File>
  			<File>file:./.sl64_gcc482/</File> 
- 			<File>file:./StRoot/StRefMultCorr/Centrality_def_refmult.txt</File>
+ 			<File>file:./StRoot/StRefMultCorr/*.txt</File>
  			<File>file:./cuts.xml</File>
  		</Package> 
  	</SandBox>

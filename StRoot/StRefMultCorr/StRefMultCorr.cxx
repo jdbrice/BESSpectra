@@ -466,7 +466,7 @@ void StRefMultCorr::read()
       Int_t startRunId=0, stopRunId=0 ;
       Double_t startZvertex=-9999., stopZvertex=-9999. ;
       ParamFile >> startRunId >> stopRunId >> startZvertex >> stopZvertex ;
-
+      cout << "PARAMS FOR " << startRunId << " --> " << stopRunId << endl;
       // Error check
       if(ParamFile.eof()) break;
 

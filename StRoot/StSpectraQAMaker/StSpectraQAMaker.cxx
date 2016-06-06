@@ -186,8 +186,8 @@ void StSpectraQAMaker::postTrackCuts( StMuTrack *primaryTrack ){
 	}
 
 	if ( tofPid.beta( ) <= 0.01  ){
-		LOG_INFO << "beta = " << tofPid.beta() << endl << endm; 
-		LOG_INFO << "tof = " << tofPid.timeOfFlight() << endl << endm; 
+		LOG_DEBUG << "beta = " << tofPid.beta() << endl << endm; 
+		LOG_DEBUG << "tof = " << tofPid.timeOfFlight() << endl << endm; 
 	}
 
 	histos->dEdx_p->Fill( pMom.mag() * primaryTrack->charge(), (globalTrack->dEdx()*1e6), eventWeight );

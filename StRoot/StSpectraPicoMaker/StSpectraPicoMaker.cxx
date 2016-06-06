@@ -45,8 +45,9 @@ void StSpectraPicoMaker::analyzeTrack( Int_t iNode, Int_t iGoodTrack ){
 	StMuBTofPidTraits tofPid = tGlobal->btofPidTraits();
 	StMuBTofPidTraits tofPid2 = tPrimary->btofPidTraits();
 
-	if ( tofPid.beta() != tofPid2.beta() )
+	if ( tofPid.beta() != tofPid2.beta() ){
 		LOG_INFO << "tof1 = " << tofPid.beta() << ", tof2 = " << tofPid2.beta() << endm;
+	}
 
 
 	mData.matchFlag[ iGoodTrack ]	= tofPid.matchFlag();
