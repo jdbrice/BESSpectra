@@ -22,11 +22,15 @@ void StSpectraSimPicoMaker::postEventCuts(){
 void StSpectraSimPicoMaker::analyzeTrack( Int_t iGoodTrack ){
 	
 	
-	mData.pPt[ iGoodTrack ] 			= getVar( "pPt" );
+	int charge = 1;
+	if ( getVar( "charge" ) < 0 )
+		charge = -1;
+
+	mData.pPt[ iGoodTrack ] 			= getVar( "pPt" ) * charge;
 	mData.gPt[ iGoodTrack ] 			= mData.pPt[ iGoodTrack ] + getVar( "gPt" );
 	mData.pEta[ iGoodTrack ] 			= getVar( "eta" );
 
-	mData.pP[ iGoodTrack ] 				= mData.pPt[ iGoodTrack ] * cosh( mData.pEta[ iGoodTrack ] );
+	mData.pP[ iGoodTrack ] 				= fabs(mData.pPt[ iGoodTrack ]) * cosh( mData.pEta[ iGoodTrack ] );
 
 	mData.nHitsFit[ iGoodTrack ] 		= getVar( "nHitsFit" );
 	mData.nHitsDedx[ iGoodTrack ] 		= getVar( "nHitsDedx" );

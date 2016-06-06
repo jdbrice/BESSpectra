@@ -7,7 +7,7 @@
 
 		<!-- Event Level -->
 		<eventWeight min="1.0" max="1.0" formula="1" />
-		<bin9 min="0" max="1" formula="1" />
+		<bin9 min="8" max="8" formula="1" />
 
 
 		<!-- Track -->
@@ -19,8 +19,8 @@
 		<nHitsFit min="20" max="23" formula="1" />
 		<nHitsDedx min="20" max="23" formula="1" />
 		<nHitsPossible min="20" max="23" formula="1" />
-		<charge min="-1" max="1" formula="-1*(x<=0) + 1 * (x>0)" />
-		<dca min="0" max="3.0" formula="1.0*exp(-0.5*((x-0.5)/0.15)^2)" />
+		<charge min="-1" max="1" formula="1" />
+		<dca min="0" max="1.0" formula="1.0*exp(-0.5*((x-0.5)/0.15)^2)" />
 		
 		<matchFlag min="1" max="2.9" formula="1" />
 		<yLocal min="-1.0" max="1.0" formula="1" />
